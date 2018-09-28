@@ -3,6 +3,8 @@ import tensorflow as tf
 from tensorflow import keras
 import matplotlib.pyplot as plt
 from os import listdir
+from keras.callbacks import TensorBoard
+
 
 # load dataset
 dataDir = "./data/trainSmallFA/"
@@ -88,6 +90,10 @@ def drawFigure():
 # use sequential model
 model = keras.Sequential()
 
+p1 = 0
+p2 = 0
+#output shape
+o1 = ((64 - k1) + 2*p1)/s1 + 1
 # just one fully connected layer
 inputdim = 64*64*3
 layer1Dim = 12 * 12 * 3
