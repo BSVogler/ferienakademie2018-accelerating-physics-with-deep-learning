@@ -27,38 +27,41 @@ targets = targets.transpose(0,2,3,1)
 
 model=keras.Sequential() # Set up
 
-model.add(keras.layers.Conv2D(filters=64,kernel_size=(4,4),strides=(2,2),padding="same",input_shape=(64,64,3)))
-model.add(keras.layers.Conv2D(filters=128,kernel_size=(4,4),strides=(2,2),padding="same"))
-model.add(keras.layers.Conv2D(filters=256,kernel_size=(4,4),strides=(2,2),padding="same"))
-model.add(keras.layers.Conv2D(filters=512,kernel_size=(4,4),strides=(2,2),padding="same"))
-model.add(keras.layers.MaxPooling2D(pool_size=(2,2), strides=None, padding='same', data_format=None))
-model.add(keras.layers.MaxPooling2D(pool_size=(2,2), strides=None, padding='same', data_format=None))
-model.add(keras.layers.UpSampling2D(size=(2,2), data_format=None))
-model.add(keras.layers.Conv2DTranspose(filters=512,kernel_size=(4,4),strides=(2,2),padding="same"))
-model.add(keras.layers.Conv2DTranspose(filters=256,kernel_size=(4,4),strides=(2,2),padding="same"))
-model.add(keras.layers.Conv2DTranspose(filters=128,kernel_size=(4,4),strides=(2,2),padding="same"))
-model.add(keras.layers.Conv2DTranspose(filters=64,kernel_size=(4,4),strides=(2,2),padding="same"))
-model.add(keras.layers.Conv2DTranspose(filters=3,kernel_size=(4,4),strides=(2,2),padding="same"))
+model.add(keras.layers.Conv2D(filters=64,kernel_size=(4,4),strides=(2,2),padding="same",input_shape=(64,64,3),activation='relu'))
+model.add(keras.layers.Conv2D(filters=128,kernel_size=(4,4),strides=(2,2),padding="same",activation='relu'))
+model.add(keras.layers.Conv2D(filters=256,kernel_size=(4,4),strides=(2,2),padding="same",activation='relu'))
+model.add(keras.layers.Conv2D(filters=512,kernel_size=(4,4),strides=(2,2),padding="same",activation='relu'))
+model.add(keras.layers.Conv2D(filters=512,kernel_size=(4,4),strides=(2,2),padding="same",activation='relu'))
+model.add(keras.layers.Conv2D(filters=512,kernel_size=(4,4),strides=(2,2),padding="same",activation='relu'))
+#model.add(keras.layers.MaxPooling2D(pool_size=(2,2), strides=None, padding='same', data_format=None))
+#model.add(keras.layers.MaxPooling2D(pool_size=(2,2), strides=None, padding='same', data_format=None))
+#model.add(keras.layers.UpSampling2D(size=(2,2), data_format=None))
+model.add(keras.layers.Conv2DTranspose(filters=512,kernel_size=(4,4),strides=(2,2),padding="same",activation='relu'))
+model.add(keras.layers.Conv2DTranspose(filters=512,kernel_size=(4,4),strides=(2,2),padding="same",activation='relu'))
+model.add(keras.layers.Conv2DTranspose(filters=256,kernel_size=(4,4),strides=(2,2),padding="same",activation='relu'))
+model.add(keras.layers.Conv2DTranspose(filters=128,kernel_size=(4,4),strides=(2,2),padding="same",activation='relu'))
+model.add(keras.layers.Conv2DTranspose(filters=64,kernel_size=(4,4),strides=(2,2),padding="same",activation='relu'))
+model.add(keras.layers.Conv2DTranspose(filters=3,kernel_size=(4,4),strides=(2,2),padding="same",activation='relu'))
 
-model.compile(optimizer=tf.train.AdamOptimizer(0.0001),loss='mean_squared_error', metrics=['accuracy']) # Compile
+model.compile(optimizer=tf.train.AdamOptimizer(0.0003),loss='mean_absolute_error', metrics=['accuracy']) # Compile
 
 #assign training data
 data_inputs  = inputs[0:700]
-data_targets = inputs[0:700]
+data_targets = targets[0:700]
 
 #print("data_input shape = ", data_input.shape)
 
 #assign validation data
-val_input  = targets[700:750]
+val_input  = inputs[700:750]
 val_target = targets[700:750]
 
 
-model.fit(data_inputs,data_targets,epochs=40,batch_size=1,validation_data=(val_input,val_target))
+model.fit(data_inputs,data_targets,epochs=10,batch_size=1,validation_data=(val_input,val_target))
 
 # Visualization
 #apply the model on the data
 k = 1
-predictions = model.predict(inputs[0:k,:], batch_size=1)
+predictions = model.predict(val_input[0:k,:], batch_size=1)
 
 vis(predictions[0,:], val_target[0,:])
 
