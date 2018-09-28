@@ -3,20 +3,20 @@ import matplotlib.pyplot as plt
 
 __all__ = ['vis']
 
-"""
-A tool for visualization the results:
-
-Parameters
-----------
-prediction: The predicted air-flow distribution, 3d numpy array, typical shape is (64,64,3)
-truth	  : The ground truth of air-flow distribution, the same shape as predicition
-
-Returns
-----------
-Nothing, but pop up a window that shows visualized results
-"""
 
 def vis(prediction, truth):
+	"""
+	A tool for visualization the results:
+
+	Parameters
+	----------
+	prediction: The predicted air-flow distribution, 3d numpy array, typical shape is (64,64,3)
+	truth	  : The ground truth of air-flow distribution, the same shape as predicition
+
+	Returns
+	----------
+	Nothing, but pop up a window that shows visualized results
+	"""
 	plt.figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
 	# predicted data
 	plt.subplot(331)
