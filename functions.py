@@ -89,6 +89,7 @@ def plotter(x, y):
 
     plt.show()
 
+
 def relative_error(truth,predictions):
     '''
     :param truth: normalized ground truth, targets as [64,64,3]
@@ -159,13 +160,16 @@ def preprocess_data(inputs, targets, norm=1):
             normalized_inputs[:, ch, :, :] = inputs[:, ch, :, :] / input_max[ch]
             normalized_targets[:, ch, :, :] = targets[:, ch, :, :] / target_max[ch]
     return normalized_inputs, normalized_targets
-# plot conv layer weights
+
+
 def plot_conv_weights(model, layer):
-    '''
+    """
+    plot conv layer weights
     :param model: nn model
     :param layer: index of layer as an integer
     :return: plot of convolution layer weights and shape of kernels and no. of weights
-    '''
+
+    """
     W = model.get_layer(index=layer).get_weights()[0]
     print('Kernel shape:',W.shape)
     if len(W.shape) == 4:
@@ -184,6 +188,12 @@ def plot_conv_weights(model, layer):
 
 
 def sizeof_fmt(num, suffix='B'):
+    """
+    bytes to human readable format
+    :param num:
+    :param suffix:
+    :return:
+    """
     for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
         if abs(num) < 1024.0:
             return "%3.1f%s%s" % (num, unit, suffix)
@@ -191,6 +201,11 @@ def sizeof_fmt(num, suffix='B'):
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
 def plot_trainingcurves(history):
+    """
+    Plots a curve.
+    :param history: returned by model.train
+    :return:
+    """
     # summarize history for loss
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])
@@ -200,8 +215,20 @@ def plot_trainingcurves(history):
     plt.legend(['train', 'validation'], loc='upper left')
     plt.show()
 
+def notify_macos(title, subtitle, message):
+    """
 
-#--------------------------------------------------------------------------------------------------
+    :param title:
+    :param subtitle:
+    :param message:
+    :return:
+    """
+    t = '-title {!r}'.format(title)
+    s = '-subtitle {!r}'.format(subtitle)
+    m = '-message {!r}'.format(message)
+    os.system('terminal-notifier {}'.format(' '.join([m, t, s])))
+
+
 #best working toy algorithm just keeping to have it
 if __name__ == "__main__":
     dataDir = os.getcwd() + '/data/trainSmallFA'

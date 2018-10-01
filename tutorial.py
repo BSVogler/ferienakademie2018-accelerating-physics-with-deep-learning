@@ -86,7 +86,7 @@ if __name__ == "__main__":
     ground_truth = ground_truth.transpose(0, 2, 3, 1)
 
     #%% draw the input data
-    draw_input(inputs,ground_truth, 0)
+    # draw_input(inputs,ground_truth, 0)
 
     #%% split into sets
     # 80/20 split train and validation set
@@ -128,14 +128,21 @@ if __name__ == "__main__":
                                   strides=(s1, s1),
                                   padding='valid',
                                   data_format = "channels_last",
-                                 activation = 'relu'))
+                                 activation = 'tanh'))
     model.add(keras.layers.Conv2D(input_shape = (16,16,3),
                                   filters = f2,
                                   kernel_size=(k2,k2),
                                   strides=(s2, s2),
                                   padding='same',
                                   data_format = "channels_last",
-                                 activation = 'relu'))
+                                 activation = 'tanh'))
+    model.add(keras.layers.Conv2D(input_shape=(16, 16, 3),
+                                  filters=3,
+                                  kernel_size=(16, 16),
+                                  strides=(1, 1),
+                                  padding='same',
+                                  data_format="channels_last",
+                                  activation='tanh'))
     model.add(keras.layers.UpSampling2D(size=(4, 4), data_format="channels_last"))
     model.add(keras.layers.Flatten())
 
@@ -144,7 +151,7 @@ if __name__ == "__main__":
     layer1Dim = 12 * 12 * 3
     layer2Dim = 64 * 64 * 3
 
-    model.add(keras.layers.Dense(layer1Dim, activation='tanh'))
+    model.add(keras.layers.Dense(layer1Dim, activation='relu'))
 
     model.add(keras.layers.Dense(64 * 64 * 3))
 
@@ -163,7 +170,11 @@ if __name__ == "__main__":
     # train the model
     history = model.fit(train, train_ground_truth, epochs=10, batch_size=50, validation_data=(validation, validation_ground_truth))
 
-    #%% show results
+    notify_macos(title='Deep Learning is done.',
+                 subtitle='Final loss: ' + str(history.history['loss'][-1]),
+                 message='Trained ' + str(epochs) + ' epochs.')
+
+    # show results
     plot_trainingcurves(history)
     # apply the model on the data
     k = 1
