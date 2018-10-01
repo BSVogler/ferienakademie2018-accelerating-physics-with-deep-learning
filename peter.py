@@ -90,8 +90,8 @@ def plotter(x, y):
 def preprocess_data(inputs, targets, norm=1):
     """
     Normalizes the data.
-    :param inputs:
-    :param targets:
+    :param inputs: dimension 0: item index, 1: channel, 2: image dim x, 3: image dimy
+    :param targets: dimension 0: item index, 1: channel, 2: image dim x, 3: image dimy
     :param norm: norm == 1: normalize into [-1,1]
     norm == 2: normalize with dividing with maximum
     :return: normalized data
@@ -121,7 +121,7 @@ def preprocess_data(inputs, targets, norm=1):
         if norm == 2:  # just divide with maximum
             normalized_inputs[:, ch, :, :] = inputs[:, ch, :, :] / input_max[ch]
             normalized_targets[:, ch, :, :] = targets[:, ch, :, :] / target_max[ch]
-        return normalized_inputs, normalized_targets
+    return normalized_inputs, normalized_targets
 
 
 # --------------------------------------------------------------------------------------------------
