@@ -158,4 +158,4 @@ if __name__ == "__main__":
     predictions = predictions.reshape(len(predictions),64,64,3)
     truth = truth.reshape(len(truth),64,64,3)
 
-    vis(predictions[0,:], truth[0,:])
+    plotter(predictions, truth)
