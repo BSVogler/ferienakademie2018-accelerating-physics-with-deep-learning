@@ -66,7 +66,7 @@ if __name__ == "__main__":
     # load dataset
     dataDir = "./data/trainSmallFA/"
     files = listdir(dataDir)
-    files.sort()
+    #files.sort()
     totalLength = len(files)
     inputs = np.empty((len(files), 3, 64, 64))
     ground_truth = np.empty((len(files), 3, 64, 64))
@@ -93,12 +93,12 @@ if __name__ == "__main__":
     sizeTrain = int(len(files)*0.8)
     sizeValidation = int(len(files)-sizeTrain)
     print("size trainset: "+str(sizeTrain) + ", size validation set:", sizeValidation)
-    train = inputs[0:sizeTrain]
-    validation = inputs[sizeTrain:len(files)]
+    train = inputs
+    #validation = inputs[sizeTrain:len(files)]
 
     # ground truth: flatten data of item and 80/20 split
-    train_ground_truth = ground_truth[0:sizeTrain].reshape((sizeTrain, -1))
-    validation_ground_truth = ground_truth[sizeTrain:len(files)].reshape(sizeValidation, -1)
+    ground_truth = ground_truth[:].reshape((len(ground_truth), -1))
+    #validation_ground_truth = ground_truth[sizeTrain:len(files)].reshape(sizeValidation, -1)
 
 
     #%% train the model
@@ -161,7 +161,8 @@ if __name__ == "__main__":
     print_memory_usage(model)
 
     # train the model
-    history = model.fit(train, train_ground_truth, epochs=10, batch_size=50, validation_data=(validation, validation_ground_truth))
+    epochs = 15
+    history = model.fit(train, ground_truth, epochs=epochs, batch_size=40, validation_split=0.2, shuffle=True)
 
     notify_macos(title='Deep Learning is done.',
                  subtitle='Final loss: ' + str(history.history['loss'][-1]),
@@ -170,9 +171,8 @@ if __name__ == "__main__":
     # show results
     plot_trainingcurves(history)
     # apply the model on the data
-    k = 1
-    predictions = model.predict(validation[0:k, :], batch_size=1)
-    truth = train_ground_truth[0:k, :]
+    predictions = model.predict(train[1, :], batch_size=1)
+    truth = ground_truth[1, :]
 
     # print("predictions shape = ", predictions.shape)
 
