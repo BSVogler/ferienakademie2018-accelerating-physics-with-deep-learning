@@ -13,7 +13,10 @@ import tensorflow as tf
 from tensorflow import keras
 import matplotlib.pyplot as plt
 from os import listdir
-
+import sys
+sys.path.insert(0, 'C:/Users/pkicsiny/Desktop/FA2018/tutorials/ferienakademie2018-accelerating-physics-with-deep-learning/')
+from functions import *
+import random
 # forces CPU usage
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
@@ -92,22 +95,62 @@ def plotter(x, y):
 
 def relative_error(truth,predictions):
     '''
-    :param truth: normalized ground truth, targets as [n_samples,64,64,3]
-    :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
-    :return: relative error
+    :param truth: normalized ground truth, targets as [64,64,3]
+    :param predictions: normalized output of network, predictions as [64,64,3]
+    :return: relative error(scalar)
     '''
     results=np.sum(np.abs(predictions - truth)) / np.sum(np.abs(truth))
     return results
+
 
 def relative_error_multiple(truth,predictions):
     '''
     :param truth: normalized ground truth, targets as [n_samples,64,64,3]
     :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
-    :return: relative error
+    :return: relative error(array)
     '''
-    results=0*predictions
-    for i in range(0,predictions.shape[1]):
-        results[i,:,:,:]=np.sum(np.abs(predictions[i,:,:,:] - truth[i,:,:,:])) / np.sum(np.abs(truth[i,:,:,:]))
+    results=np.zeros(predictions.shape[0])
+    for i in range(0,predictions.shape[0]):
+        results[i]=np.sum(np.abs(predictions[i,:,:,:] - truth[i,:,:,:])) / np.sum(np.abs(truth[i,:,:,:]))
+    return results
+
+
+def error_distribution(truth,predictions,nbins=20):
+    '''
+    'param truth: normalized ground truth, targets as [n_samples,64,64,3]
+    'param predictions: normalized output of network, predictions as [n_samples,64,64,3]
+    'return: nothing (plots relative error distributions)
+    '''
+    errors=relative_error_multiple(truth,predictions)
+    plt.hist(errors,nbins)
+    plt.xlabel('relative error')
+    plt.ylabel('occurences')
+    plt.title('mean = '+str(np.mean(errors))[0:5]+', min = '+str(np.min(errors))[0:5]+', max = '+str(np.max(errors))[0:5])
+    plt.show()
+
+
+ 
+
+#split test data
+def randsplit(inputs,targets,frac=.9):
+    '''splits a dataset into two bins
+    param inputs: input datasets
+    param targets: target datasets
+    param frac: fraction where the split is applied
+    return inputs1: first bin inputs
+    return targets1: first bin targets
+    return inputs2: second bin inputs
+    return targets2: second bin targets
+    '''
+    numElements=int(inputs.shape[0]*frac)
+    indices=random.sample(range(0, inputs.shape[0]), numElements)
+    mask = np.ones(inputs.shape[0], np.bool)
+    mask[indices] = 0
+    inputs1=inputs[indices,:,:,:]
+    inputs2=inputs[mask,:,:,:]
+    targets1=targets[indices,:,:,:]
+    targets2=targets[mask,:,:,:]
+    return inputs1,targets1,inputs2,targets2
 
 
 
@@ -148,15 +191,13 @@ def preprocess_data(inputs, targets, norm=1):
             normalized_targets[:, ch, :, :] = targets[:, ch, :, :] / target_max[ch]
     return normalized_inputs, normalized_targets
 
-
+# plot conv layer weights
 def plot_conv_weights(model, layer):
-    """
-    plot conv layer weights
+    '''
     :param model: nn model
     :param layer: index of layer as an integer
     :return: plot of convolution layer weights and shape of kernels and no. of weights
-
-    """
+    '''
     W = model.get_layer(index=layer).get_weights()[0]
     print('Kernel shape:',W.shape)
     if len(W.shape) == 4:
@@ -175,24 +216,14 @@ def plot_conv_weights(model, layer):
 
 
 def sizeof_fmt(num, suffix='B'):
-    """
-    bytes to human readable format
-    :param num:
-    :param suffix:
-    :return:
-    """
     for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
         if abs(num) < 1024.0:
             return "%3.1f%s%s" % (num, unit, suffix)
         num /= 1024.0
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
+
 def plot_trainingcurves(history):
-    """
-    Plots a curve.
-    :param history: returned by model.train
-    :return:
-    """
     # summarize history for loss
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])
@@ -201,19 +232,6 @@ def plot_trainingcurves(history):
     plt.xlabel('epoch')
     plt.legend(['train', 'validation'], loc='upper left')
     plt.show()
-
-def notify_macos(title, subtitle, message):
-    """
-
-    :param title:
-    :param subtitle:
-    :param message:
-    :return:
-    """
-    t = '-title {!r}'.format(title)
-    s = '-subtitle {!r}'.format(subtitle)
-    m = '-message {!r}'.format(message)
-    os.system('terminal-notifier {}'.format(' '.join([m, t, s])))
 
 
 def print_memory_usage(model):
@@ -333,32 +351,54 @@ if __name__ == "__main__":
 
     model = keras.Sequential()
 
-    model.add(keras.layers.Conv2D(input_shape=(64, 64, 3),
-                                  filters=f1,
-                                  kernel_size=(k1, k1),
-                                  strides=(s1, s1),
-                                  padding='valid',
-                                  data_format="channels_last",
-                                  activation='tanh'))
-    model.add(keras.layers.Conv2D(input_shape=(16, 16, 3),
-                                  filters=f2,
-                                  kernel_size=(k2, k2),
-                                  strides=(s2, s2),
-                                  padding='same',
-                                  data_format="channels_last",
-                                  activation='tanh'))
-    model.add(keras.layers.UpSampling2D(size=(4, 4), data_format="channels_last"))
+    conv1 = keras.layers.Conv2D(input_shape=(64, 64, 3),
+                                filters=f1,
+                                kernel_size=(k1, k1),
+                                strides=(s1, s1),
+                                padding='valid',
+                                data_format="channels_last",
+                                activation='tanh')
+    conv2 = keras.layers.Conv2D(input_shape=(16, 16, 3),
+                                filters=f2,
+                                kernel_size=(k2, k2),
+                                strides=(s2, s2),
+                                padding='same',
+                                data_format="channels_last",
+                                activation='tanh')
+    conv3 = keras.layers.Conv2D(input_shape=(8, 8, 3),
+                                filters=3,
+                                kernel_size=(8, 8),
+                                strides=(1, 1),
+                                padding='same',
+                                data_format="channels_last",
+                                activation='tanh')
+    upsample1 = keras.layers.UpSampling2D(size=(4, 4), data_format="channels_last", input_shape=(16, 16, 3))
+    dense1 = keras.layers.Dense(64 * 64 * 3, activation='tanh')
+    # architeccture
+    model.add(conv1)
+    model.add(conv2)
+    model.add(conv3)
+    model.add(upsample1)
     model.add(keras.layers.Flatten())
-    # model.add(keras.layers.Dense(16*16*3,activation='relu'))
-    model.add(keras.layers.Dense(64 * 64 * 3, activation='tanh'))
-
-    # configure the model
-    model.compile(optimizer=tf.train.AdamOptimizer(0.0001), loss='mean_absolute_error', metrics=['accuracy'])
+    model.add(dense1)
 
     # train the model
-    model.fit(training_input, training_target, batch_size=60, epochs=8, validation_data=(val_input, val_target),
+    model.compile(optimizer=tf.train.AdamOptimizer(0.0001), loss='mean_absolute_error',
+                  metrics=['accuracy', relative_error])
+    model.fit(training_input, training_target, batch_size=60, epochs=20, validation_data=(val_input, val_target),
               verbose=1)
+    model.summary()
+    hist = model.history
 
+    plt.plot(hist.history['relative_error'])
+    plt.plot(hist.history['val_relative_error'])
+    plt.title('rel error')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'validation'], loc='upper left')
+    plt.show()
+
+    plot_trainingcurves(hist)
     # test
     predictions = model.predict(test_input, batch_size=5)
     truth = test_target
