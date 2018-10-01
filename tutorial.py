@@ -158,7 +158,6 @@ if __name__ == "__main__":
     # configure the model
     model.compile(optimizer=tf.train.AdamOptimizer(0.0001), loss='mean_squared_error', metrics=['accuracy'])
     # AdamOptimizer(0.0006)
-    model.summary()
 
     print_memory_usage(model)
 
