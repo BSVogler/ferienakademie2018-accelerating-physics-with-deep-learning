@@ -19,8 +19,13 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 # make figure
 # make figure
 def plotter(x, y, index=-1):
-    # x: predictions
-    # y:ground truth
+    """
+
+    :param x: predictions
+    :param y: ground truth
+    :param index: index 0 is best result, ordered descending
+    :return:
+    """
     length = len(x)
     random_sample = np.random.random_integers(0, length - 1)
     if index > -1:
