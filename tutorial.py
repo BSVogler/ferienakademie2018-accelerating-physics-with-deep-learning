@@ -179,3 +179,8 @@ if __name__ == "__main__":
     truth = truth.reshape(len(truth),64,64,3)
 
     vis(predictions[0,:], truth[0,:])
+
+    # Calling the function
+    notify_macos(title='Training is done.',
+           subtitle='Final loss: '+history.history,
+           message='Hello, this is me, notifying you!')

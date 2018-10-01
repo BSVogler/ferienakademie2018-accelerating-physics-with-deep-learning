@@ -180,6 +180,19 @@ def plot_trainingcurves(history):
     plt.legend(['train', 'validation'], loc='upper left')
     plt.show()
 
+def notify_macos(title, subtitle, message):
+    """
+
+    :param title:
+    :param subtitle:
+    :param message:
+    :return:
+    """
+    t = '-title {!r}'.format(title)
+    s = '-subtitle {!r}'.format(subtitle)
+    m = '-message {!r}'.format(message)
+    os.system('terminal-notifier {}'.format(' '.join([m, t, s])))
+
 
 #--------------------------------------------------------------------------------------------------
 #best working toy algorithm just keeping to have it
