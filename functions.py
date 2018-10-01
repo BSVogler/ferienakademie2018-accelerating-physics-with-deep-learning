@@ -301,3 +301,18 @@ def print_memory_usage(model):
     memory = sumWeights * 4  # we are using four bytes for each weight
 
     print(str(sumWeights) + " weights use " + str(sizeof_fmt(memory)))
+
+#orders predictions according to their rel. error
+def arg_getter(truth,predictions):
+    '''
+
+    :param truth: ground truth
+    :param predictions: output from network
+    :return: list of ordered sample indices in decreasing order
+    '''
+    test = relative_error_multiple(truth,predictions)
+    sort = np.asarray(sorted(test))
+    print(test.argmax())
+    sorted_args = [list(test).index(error) for error in sort]
+    #decreasing order, arg 0 is the best, -1 is the worst
+    return sorted_args
