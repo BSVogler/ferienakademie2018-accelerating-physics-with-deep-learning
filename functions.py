@@ -90,6 +90,28 @@ def plotter(x, y):
     plt.show()
 
 
+def relative_error(truth,predictions):
+    '''
+    :param truth: normalized ground truth, targets as [n_samples,64,64,3]
+    :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
+    :return: relative error
+    '''
+    results=np.sum(np.abs(predictions - truth)) / np.sum(np.abs(truth))
+    return results
+
+def relative_error_multiple(truth,predictions):
+    '''
+    :param truth: normalized ground truth, targets as [n_samples,64,64,3]
+    :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
+    :return: relative error
+    '''
+    results=0*predictions
+    for i in range(0,predictions.shape[1]):
+        results[i,:,:,:]=np.sum(np.abs(predictions[i,:,:,:] - truth[i,:,:,:])) / np.sum(np.abs(truth[i,:,:,:]))
+
+
+
+# normalize data
 def preprocess_data(inputs, targets, norm=1):
     """
     Normalizes the data.
@@ -194,7 +216,6 @@ def notify_macos(title, subtitle, message):
     os.system('terminal-notifier {}'.format(' '.join([m, t, s])))
 
 
-#--------------------------------------------------------------------------------------------------
 #best working toy algorithm just keeping to have it
 if __name__ == "__main__":
     dataDir = os.getcwd() + '/data/trainSmallFA'
