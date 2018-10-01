@@ -14,11 +14,13 @@ from tensorflow import keras
 import matplotlib.pyplot as plt
 from os import listdir
 import sys
-sys.path.insert(0, 'C:/Users/pkicsiny/Desktop/FA2018/tutorials/ferienakademie2018-accelerating-physics-with-deep-learning/')
+
 from functions import *
 import random
+
 # forces CPU usage
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
 
 # --------------------------------------------------------------------------------------------------
 # functions
@@ -93,46 +95,45 @@ def plotter(x, y):
     plt.show()
 
 
-def relative_error(truth,predictions):
+def relative_error(truth, predictions):
     '''
     :param truth: normalized ground truth, targets as [64,64,3]
     :param predictions: normalized output of network, predictions as [64,64,3]
     :return: relative error(scalar)
     '''
-    results=np.sum(np.abs(predictions - truth)) / np.sum(np.abs(truth))
+    results = np.sum(np.abs(predictions - truth)) / np.sum(np.abs(truth))
     return results
 
 
-def relative_error_multiple(truth,predictions):
+def relative_error_multiple(truth, predictions):
     '''
     :param truth: normalized ground truth, targets as [n_samples,64,64,3]
     :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
     :return: relative error(array)
     '''
-    results=np.zeros(predictions.shape[0])
-    for i in range(0,predictions.shape[0]):
-        results[i]=np.sum(np.abs(predictions[i,:,:,:] - truth[i,:,:,:])) / np.sum(np.abs(truth[i,:,:,:]))
+    results = np.zeros(predictions.shape[0])
+    for i in range(0, predictions.shape[0]):
+        results[i] = np.sum(np.abs(predictions[i, :, :, :] - truth[i, :, :, :])) / np.sum(np.abs(truth[i, :, :, :]))
     return results
 
 
-def error_distribution(truth,predictions,nbins=20):
+def error_distribution(truth, predictions, nbins=20):
     '''
     'param truth: normalized ground truth, targets as [n_samples,64,64,3]
     'param predictions: normalized output of network, predictions as [n_samples,64,64,3]
     'return: nothing (plots relative error distributions)
     '''
-    errors=relative_error_multiple(truth,predictions)
-    plt.hist(errors,nbins)
+    errors = relative_error_multiple(truth, predictions)
+    plt.hist(errors, nbins)
     plt.xlabel('relative error')
     plt.ylabel('occurences')
-    plt.title('mean = '+str(np.mean(errors))[0:5]+', min = '+str(np.min(errors))[0:5]+', max = '+str(np.max(errors))[0:5])
+    plt.title('mean = ' + str(np.mean(errors))[0:5] + ', min = ' + str(np.min(errors))[0:5] + ', max = ' + str(
+        np.max(errors))[0:5])
     plt.show()
 
 
- 
-
-#split test data
-def randsplit(inputs,targets,frac=.9):
+# split test data
+def randsplit(inputs, targets, frac=.9):
     '''splits a dataset into two bins
     param inputs: input datasets
     param targets: target datasets
@@ -142,16 +143,15 @@ def randsplit(inputs,targets,frac=.9):
     return inputs2: second bin inputs
     return targets2: second bin targets
     '''
-    numElements=int(inputs.shape[0]*frac)
-    indices=random.sample(range(0, inputs.shape[0]), numElements)
+    numElements = int(inputs.shape[0] * frac)
+    indices = random.sample(range(0, inputs.shape[0]), numElements)
     mask = np.ones(inputs.shape[0], np.bool)
     mask[indices] = 0
-    inputs1=inputs[indices,:,:,:]
-    inputs2=inputs[mask,:,:,:]
-    targets1=targets[indices,:,:,:]
-    targets2=targets[mask,:,:,:]
-    return inputs1,targets1,inputs2,targets2
-
+    inputs1 = inputs[indices, :, :, :]
+    inputs2 = inputs[mask, :, :, :]
+    targets1 = targets[indices, :, :, :]
+    targets2 = targets[mask, :, :, :]
+    return inputs1, targets1, inputs2, targets2
 
 
 # normalize data
@@ -191,6 +191,7 @@ def preprocess_data(inputs, targets, norm=1):
             normalized_targets[:, ch, :, :] = targets[:, ch, :, :] / target_max[ch]
     return normalized_inputs, normalized_targets
 
+
 # plot conv layer weights
 def plot_conv_weights(model, layer):
     '''
@@ -199,20 +200,20 @@ def plot_conv_weights(model, layer):
     :return: plot of convolution layer weights and shape of kernels and no. of weights
     '''
     W = model.get_layer(index=layer).get_weights()[0]
-    print('Kernel shape:',W.shape)
+    print('Kernel shape:', W.shape)
     if len(W.shape) == 4:
         W = np.squeeze(W)
         w = W.shape[0]
         h = W.shape[1]
         channels = W.shape[2]
         filters = W.shape[3]
-        fig, axs = plt.subplots(filters,channels, figsize=(20,20))
-        fig.subplots_adjust(hspace = 1)
+        fig, axs = plt.subplots(filters, channels, figsize=(20, 20))
+        fig.subplots_adjust(hspace=1)
         axs = axs.ravel()
-        for i in range(channels*filters):
-            axs[i].imshow(W[:,:,i%channels,i//channels])
-            axs[i].set_title('Filter' + str(i//channels) + '\nFeature' +  str(i%channels))
-        print('Number of trainable weights in layer:',w*h*channels*filters)
+        for i in range(channels * filters):
+            axs[i].imshow(W[:, :, i % channels, i // channels])
+            axs[i].set_title('Filter' + str(i // channels) + '\nFeature' + str(i % channels))
+        print('Number of trainable weights in layer:', w * h * channels * filters)
 
 
 def sizeof_fmt(num, suffix='B'):
@@ -253,8 +254,7 @@ def print_memory_usage(model):
     print(str(sumWeights) + " weights use " + str(sizeof_fmt(memory)))
 
 
-
-#best working toy algorithm just keeping to have it
+# best working toy algorithm just keeping to have it
 if __name__ == "__main__":
     dataDir = os.getcwd() + '/data/trainSmallFA'
     files = listdir(dataDir)
