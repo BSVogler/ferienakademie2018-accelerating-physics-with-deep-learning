@@ -16,8 +16,6 @@ from os import listdir
 
 # forces CPU usage
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-print(os.getcwd())
-
 
 # --------------------------------------------------------------------------------------------------
 # functions
