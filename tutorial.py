@@ -128,22 +128,22 @@ if __name__ == "__main__":
                                   strides=(s1, s1),
                                   padding='valid',
                                   data_format = "channels_last",
-                                 activation = 'tanh'))
+                                 activation = 'elu'))
     model.add(keras.layers.Conv2D(input_shape = (16,16,f1),
                                   filters = f2,
                                   kernel_size=(k2,k2),
                                   strides=(s2, s2),
                                   padding='same',
                                   data_format = "channels_last",
-                                 activation = 'tanh'))
+                                 activation = 'elu'))
     model.add(keras.layers.Conv2D(input_shape=(8, 8, f2),
                                   filters=3,
                                   kernel_size=(8, 8),
                                   strides=(1, 1),
                                   padding='same',
                                   data_format="channels_last",
-                                  activation='tanh'))
-    model.add(keras.layers.UpSampling2D(size=(4, 4), data_format="channels_last"))
+                                  activation='elu'))
+    #model.add(keras.layers.UpSampling2D(size=(4, 4), data_format="channels_last"))
     model.add(keras.layers.Flatten())
 
     # just one fully connected layer
