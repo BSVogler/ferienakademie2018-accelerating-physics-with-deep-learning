@@ -86,7 +86,7 @@ if __name__ == "__main__":
     ground_truth = ground_truth.transpose(0, 2, 3, 1)
 
     #%% draw the input data
-    draw_input(inputs,ground_truth, 0)
+    # draw_input(inputs,ground_truth, 0)
 
     #%% split into sets
     # 80/20 split train and validation set
