@@ -53,11 +53,11 @@ def vis(prediction, truth):
 	plt.colorbar()
 	plt.subplot(338)
 	plt.title('Difference x velocity')
-	plt.imshow((truth[:,:,1] - prediction[:,:,0]),cmap='jet')
+	plt.imshow((truth[:,:,1] - prediction[:,:,1]),cmap='jet')
 	plt.colorbar()
 	plt.subplot(339)
 	plt.title('Difference y velocity')
-	plt.imshow((truth[:,:,1] - prediction[:,:,2]),cmap='jet')
+	plt.imshow((truth[:,:,2] - prediction[:,:,2]),cmap='jet')
 	plt.colorbar()
 
 	plt.show()
