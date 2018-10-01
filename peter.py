@@ -82,6 +82,39 @@ def plotter(x, y):
     plt.axis('off')
 
     plt.show()
+
+
+def preprocess_data(inputs, targets, norm=1):
+    '''
+    norm == 1: normalize into [-1,1]
+    norm == 2: normalize with dividing with maximum
+    '''
+    normalized_inputs = np.empty_like(inputs)
+    normalized_targets = np.empty_like(targets)
+    input_max = {}
+    target_max = {}
+    input_min = {}
+    target_min = {}
+
+    for ch in range(0, 3):
+        input_max[ch] = inputs[:, ch, :, :].max()
+        input_min[ch] = inputs[:, ch, :, :].min()
+
+        target_max[ch] = targets[:, ch, :, :].max()
+        target_min[ch] = targets[:, ch, :, :].min()
+
+        # normalization 1
+        if norm == 1:  # to [-1,+1]
+            normalized_inputs[:, ch, :, :] = 2 * (inputs[:, ch, :, :] - input_min[ch]) / (
+            input_max[ch] - input_min[ch]) - 1
+            normalized_targets[:, ch, :, :] = 2 * (targets[:, ch, :, :] - target_min[ch]) / (
+            target_max[ch] - target_min[ch]) - 1
+
+        # normalization 2
+        if norm == 2:  # just divide with maximum
+            normalized_inputs[:, ch, :, :] = inputs[:, ch, :, :] / input_max[ch]
+            normalized_targets[:, ch, :, :] = targets[:, ch, :, :] / target_max[ch]
+        return normalized_inputs, normalized_targets
 #--------------------------------------------------------------------------------------------------
 dataDir = os.getcwd() + '/data/trainSmallFA'
 files = listdir(dataDir)
@@ -118,12 +151,7 @@ target_maxes = {}
 
 #data preprocessing
 #normalize values
-for ch in range(0,3):
-    input_maxes[ch] = inputs[:,ch,:,:].max()
-    target_maxes[ch] = targets[:,ch,:,:].max()
-    normalized_inputs[:,ch,:,:] = inputs[:,ch,:,:]/inputs[:,ch,:,:].max()
-    normalized_targets[:,ch,:,:] = targets[:,ch,:,:]/targets[:,ch,:,:].max()
-
+normalized_inputs, normalized_targets = preprocess_data(inputs, targets, norm=2)
 print('Normalized input maxes:',normalized_inputs[:,0,:,:].max(), normalized_inputs[:,1,:,:].max(), normalized_inputs[:,2,:,:].max())
 print('Normalized input mins:',normalized_inputs[:,0,:,:].min(), normalized_inputs[:,1,:,:].min(), normalized_inputs[:,2,:,:].min())
 print('Normalized target maxes:',normalized_targets[:,0,:,:].max(), normalized_targets[:,1,:,:].max(), normalized_targets[:,2,:,:].max())
