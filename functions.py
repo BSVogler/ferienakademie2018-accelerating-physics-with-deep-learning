@@ -1,13 +1,30 @@
+import os
+
+# forces CPU usage
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+import numpy as np
+import tensorflow as tf
+from tensorflow import keras
+import matplotlib.pyplot as plt
+from os import listdir
+import sys
+from functions import *
+import random
+# forces CPU usage
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
+
 # functions
 # make figure
-def plotter(x, y):
-    '''
-    :param x: output of network, predictions
-    :param y: ground truth, targets
-    :return: plots in 3x4 outlay, preds., targets, differences, relative differences
-    '''
+# make figure
+def plotter(x, y, index=-1):
+    # x: predictions
+    # y:ground truth
     length = len(x)
     random_sample = np.random.random_integers(0, length - 1)
+    if index > -1:
+        random_sample = index
     plt.figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
     print(random_sample)
     # predicted data
@@ -50,20 +67,50 @@ def plotter(x, y):
 
     # difference
     plt.subplot(337)
+    p = y[random_sample, :, :, 0] - x[random_sample, :, :, 0]
+    pmask = np.ma.masked_where(np.abs(p) <= 5e-3, p)
     plt.title('Difference pressure', fontsize=10)
-    plt.imshow((y[random_sample, :, :, 0] - x[random_sample, :, :, 0]), cmap='jet')
+    plt.imshow(pmask, cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(338)
+    vx = y[random_sample, :, :, 1] - x[random_sample, :, :, 1]
+    vxmask = np.ma.masked_where(np.abs(vx) <= 5e-3, vx)
     plt.title('Difference x velocity', fontsize=10)
-    plt.imshow((y[random_sample, :, :, 1] - x[random_sample, :, :, 1]), cmap='jet')
+    plt.imshow(vxmask, cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(339)
+    vy = y[random_sample, :, :, 2] - x[random_sample, :, :, 2]
+    vymask = np.ma.masked_where(np.abs(vy) <= 5e-3, vy)
     plt.title('Difference y velocity', fontsize=10)
-    plt.imshow((y[random_sample, :, :, 2] - x[random_sample, :, :, 2]), cmap='jet')
+    plt.imshow(vymask, cmap='jet')
+    plt.colorbar()
+    plt.axis('off')
+
+    # relative error
+    plt.figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
+
+    plt.subplot(331)
+    plt.title('Rel. error pressure', fontsize=10)
+    plt.imshow(np.abs(y[random_sample, :, :, 0] - x[random_sample, :, :, 0]) / np.abs(y[random_sample, :, :, 0]),
+               cmap='jet')
+    plt.colorbar()
+    plt.axis('off')
+
+    plt.subplot(332)
+    plt.title('Rel. error x velocity', fontsize=10)
+    plt.imshow(np.abs(y[random_sample, :, :, 1] - x[random_sample, :, :, 1]) / np.abs(y[random_sample, :, :, 1]),
+               cmap='jet')
+    plt.colorbar()
+    plt.axis('off')
+
+    plt.subplot(333)
+    plt.title('Rel. error y velocity', fontsize=10)
+    plt.imshow(np.abs(y[random_sample, :, :, 2] - x[random_sample, :, :, 2]) / np.abs(y[random_sample, :, :, 2]),
+               cmap='jet')
     plt.colorbar()
     plt.axis('off')
 

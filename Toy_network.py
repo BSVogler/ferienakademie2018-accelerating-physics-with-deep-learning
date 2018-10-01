@@ -60,6 +60,7 @@ if __name__ == "__main__":
     # data preprocessing
     # normalize values
     normalized_inputs, normalized_targets = preprocess_data(inputs, targets, norm=2)
+
     print('Normalized input maxes:', normalized_inputs[:, 0, :, :].max(), normalized_inputs[:, 1, :, :].max(),
           normalized_inputs[:, 2, :, :].max())
     print('Normalized input mins:', normalized_inputs[:, 0, :, :].min(), normalized_inputs[:, 1, :, :].min(),
@@ -69,35 +70,28 @@ if __name__ == "__main__":
     print('Normalized target mins:', normalized_targets[:, 0, :, :].min(), normalized_targets[:, 1, :, :].min(),
           normalized_targets[:, 2, :, :].min())
 
+    # split and shuffle dataset
+    train_val_inputs, train_val_targets, test_inputs, test_targets = randsplit(normalized_inputs,
+                                                                               normalized_targets,
+                                                                               frac=.9)
+    # transposing
     # training data
-    t = 600
-    training_input = normalized_inputs[:t].transpose(0, 2, 3, 1)
-    training_target = normalized_targets[:t].transpose(0, 2, 3, 1)
-
-    # validation data
-    v = 100
-    val_input = normalized_inputs[t:t + v].transpose(0, 2, 3, 1)
-    val_target = normalized_targets[t:t + v].transpose(0, 2, 3, 1)
+    train_val_inputs = train_val_inputs.transpose(0, 2, 3, 1)
+    train_val_targets = train_val_targets.transpose(0, 2, 3, 1)
 
     # test dataset
-    test_input = normalized_inputs[t + v:].transpose(0, 2, 3, 1)
-    test_target = normalized_targets[t + v:].transpose(0, 2, 3, 1)
+    test_inputs = test_inputs.transpose(0, 2, 3, 1)
+    test_targets = test_targets.transpose(0, 2, 3, 1)
 
-    print('Training data shape:', np.shape(training_input), np.shape(training_target))
-    print('Validation data shape:', np.shape(val_input), np.shape(val_target))
-    print('Test data shape:', np.shape(test_input), np.shape(test_target))
+    print('Training data shape:', np.shape(train_val_inputs), np.shape(train_val_targets))
+    print('Test data shape:', np.shape(test_inputs), np.shape(test_targets))
 
-    # flattening if first layer is fcl
-    # training_input = np.reshape(training_input,(t,-1))
-    training_target = np.reshape(training_target, (t, -1))
-    # val_input = np.reshape(val_input,(v,-1))
-    val_target = np.reshape(val_target, (v, -1))
-    # test_input = np.reshape(test_input,(51,-1))
-    test_target = np.reshape(test_target, (51, -1))
+    # flattening if last layer is fcl
+    train_val_targets = np.reshape(train_val_targets, (len(train_val_targets), -1))
+    test_targets = np.reshape(test_targets, (len(test_targets), -1))
 
-    print('Training data shape:', np.shape(training_input), np.shape(training_target))
-    print('Validation data shape:', np.shape(val_input), np.shape(val_target))
-    print('Test data shape:', np.shape(test_input), np.shape(test_target))
+    print('Training data shape:', np.shape(train_val_inputs), np.shape(train_val_targets))
+    print('Test data shape:', np.shape(test_inputs), np.shape(test_targets))
 
     # convolution filters
     f1 = 8
@@ -111,11 +105,6 @@ if __name__ == "__main__":
     # padding
     p1 = 0
     p2 = 0
-    # output shape
-    o1 = ((64 - k1) + 2 * p1) / s1 + 1
-    print(o1)
-    o2 = ((o1 - k2) + 2 * p2) / s2 + 1
-    print(o2)
 
     model = keras.Sequential()
 
@@ -153,8 +142,12 @@ if __name__ == "__main__":
     # train the model
     model.compile(optimizer=tf.train.AdamOptimizer(0.0001), loss='mean_absolute_error',
                   metrics=['accuracy', relative_error])
-    model.fit(training_input, training_target, batch_size=60, epochs=20, validation_data=(val_input, val_target),
-              verbose=1)
+    model.fit(train_val_inputs,
+              train_val_targets,
+              batch_size=60,
+              epochs=50,
+              validation_split=0.2,
+              shuffle=True)
     model.summary()
     hist = model.history
 
@@ -167,11 +160,17 @@ if __name__ == "__main__":
     plt.show()
 
     plot_trainingcurves(hist)
+
     # test
-    predictions = model.predict(test_input, batch_size=5)
-    truth = test_target
+    predictions = model.predict(test_inputs, batch_size=10)
+    truth = test_targets
 
-    predictions = np.reshape(predictions, (51, 64, 64, 3))
-    truth = np.reshape(truth, (51, 64, 64, 3))
+    predictions = np.reshape(predictions, (len(test_inputs), 64, 64, 3))
+    truth = np.reshape(truth, (len(test_targets), 64, 64, 3))
 
-    plotter(predictions, truth)
+    error_distribution(truth, predictions)
+
+    test = relative_error_multiple(truth, predictions)
+    test.argmin()
+
+    plotter(predictions, truth, index=1)
