@@ -83,7 +83,6 @@ def plotter(x, y):
 
     plt.show()
 
-
 def preprocess_data(inputs, targets, norm=1):
     '''
     norm == 1: normalize into [-1,1]
@@ -114,7 +113,27 @@ def preprocess_data(inputs, targets, norm=1):
         if norm == 2:  # just divide with maximum
             normalized_inputs[:, ch, :, :] = inputs[:, ch, :, :] / input_max[ch]
             normalized_targets[:, ch, :, :] = targets[:, ch, :, :] / target_max[ch]
-        return normalized_inputs, normalized_targets
+    return normalized_inputs, normalized_targets
+
+def plot_conv_weights(model, layer):
+    W = model.get_layer(index=layer).get_weights()[0]
+    print(W.shape)
+    if len(W.shape) == 4:
+        W = np.squeeze(W)
+        print(W.shape)
+        w = W.shape[0]
+        h = W.shape[1]
+        channels = W.shape[2]
+        filters = W.shape[3]
+        #W = W.reshape((w, h, W.shape[2]*W.shape[3]))
+        fig, axs = plt.subplots(filters,channels, figsize=(20,20))
+        fig.subplots_adjust(hspace = 1)
+        axs = axs.ravel()
+        #axs = axs.yaxis.set_label_position("right")
+        for i in range(channels*filters):
+            axs[i].imshow(W[:,:,i%channels,i//channels])
+            axs[i].set_title('Filter' + str(i//channels) + '\nFeature' +  str(i%channels))
+        print('Number of trainable weights in layer:',w*h*channels*filters)
 #--------------------------------------------------------------------------------------------------
 dataDir = os.getcwd() + '/data/trainSmallFA'
 files = listdir(dataDir)
