@@ -155,17 +155,10 @@ if __name__ == "__main__":
 
     model.add(keras.layers.Dense(64 * 64 * 3))
 
-    # ignores bias
-    numWeights = inputdim*layer1Dim+layer1Dim*layer2Dim
-
-
-    memory = numWeights * 4  # we are using four bytes for each weight
-
-    print(str(numWeights) + " weights use " + str(sizeof_fmt(memory)))
-
     # configure the model
     model.compile(optimizer=tf.train.AdamOptimizer(0.0001), loss='mean_squared_error', metrics=['accuracy'])
     # AdamOptimizer(0.0006)
+    print_memory_usage(model)
 
     # train the model
     history = model.fit(train, train_ground_truth, epochs=10, batch_size=50, validation_data=(validation, validation_ground_truth))

@@ -216,6 +216,26 @@ def notify_macos(title, subtitle, message):
     os.system('terminal-notifier {}'.format(' '.join([m, t, s])))
 
 
+def print_memory_usage(model):
+    """
+    calculate number weights and memory
+    :param model:
+    :return:
+    """
+    sumWeights = 0
+    for l in model.layers:
+        weights = l.get_weights()
+        num_in_layer = 0
+        for w in weights:
+            num_in_layer += w.size
+        sumWeights += num_in_layer
+
+    memory = sumWeights * 4  # we are using four bytes for each weight
+
+    print(str(sumWeights) + " weights use " + str(sizeof_fmt(memory)))
+
+
+
 #best working toy algorithm just keeping to have it
 if __name__ == "__main__":
     dataDir = os.getcwd() + '/data/trainSmallFA'
