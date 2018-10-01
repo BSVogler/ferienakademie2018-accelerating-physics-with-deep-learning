@@ -146,6 +146,26 @@ def plot_conv_weights(model, layer):
             axs[i].imshow(W[:,:,i%channels,i//channels])
             axs[i].set_title('Filter' + str(i//channels) + '\nFeature' +  str(i%channels))
         print('Number of trainable weights in layer:',w*h*channels*filters)
+
+
+def sizeof_fmt(num, suffix='B'):
+    for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
+        if abs(num) < 1024.0:
+            return "%3.1f%s%s" % (num, unit, suffix)
+        num /= 1024.0
+    return "%.1f%s%s" % (num, 'Yi', suffix)
+
+def plot_trainingcurves(history):
+    # summarize history for loss
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'validation'], loc='upper left')
+    plt.show()
+
+
 #--------------------------------------------------------------------------------------------------
 #best working toy algorithm just keeping to have it
 if __name__ == "__main__":
