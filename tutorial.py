@@ -23,18 +23,23 @@ for i, file in enumerate(files):
     ground_truth[i] = d[3:6]  # p, velx, vely
 # print("inputs shape = ", inputs.shape)
 
+inputs, ground_truth = preprocess_data(inputs, ground_truth)
 
-# reorder because the channels msut be the last dimension
+# reorder because the channels must be the last dimension
 inputs = inputs.transpose(0, 2, 3, 1)
 ground_truth = ground_truth.transpose(0, 2, 3, 1)
 
 #%% draw the input data
 
 
-def drawFigure():
+def draw_input(input, ground_truth, i=0):
+    """
+
+    :param i:
+    :return:
+    """
     # show first file
     plt.figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
-
     # output layout:
     # [0] freestream field X + boundary
     # [1] freestream field Y + boundary
@@ -45,46 +50,59 @@ def drawFigure():
 
     # [0] freestream field X + boundary
     plt.subplot(231)
-    plt.imshow(inputs[0, 0, :, :], cmap='jet')
+    plt.imshow(inputs[i, :, :, 0], cmap='jet')
     plt.colorbar()
     plt.title('freestream field X + boundary')
 
     # [1] freestream field Y + boundary
     plt.subplot(232)
-    plt.imshow(inputs[0, 1, :, :], cmap='jet')
+    plt.imshow(inputs[i, :, :, 1], cmap='jet')
     plt.colorbar()
     plt.title('freestream field Y + boundary')
 
     # [2] binary mask for boundary
     plt.subplot(233)
-    plt.imshow(inputs[0, 2, :, :], cmap='jet')
+    plt.imshow(inputs[i, :, :, 2], cmap='jet')
     plt.colorbar()
     plt.title('binary mask for boundary')
 
     # [3] pressure output
     plt.subplot(234)
-    plt.imshow(train_ground_truth[0, 0, :, :], cmap='jet')
+    plt.imshow(ground_truth[i, :, :, 0], cmap='jet')
     plt.colorbar()
     plt.title('pressure output')
 
     # [4] velocity X output
     plt.subplot(235)
-    plt.imshow(train_ground_truth[0, 1, :, :], cmap='jet')
+    plt.imshow(ground_truth[i, :, :, 1], cmap='jet')
     plt.colorbar()
     plt.title('velocity X output')
 
     # [5] velocity Y output
     plt.subplot(236)
-    plt.imshow(train_ground_truth[0, 2, :, :], cmap='jet')
+    plt.imshow(ground_truth[i, :, :, 2], cmap='jet')
     plt.colorbar()
     plt.title('velocity Y output')
 
     plt.show()
 
-# showFigure()
 
-#%%
+draw_input(inputs,ground_truth, 0)
 
+#%% split into sets
+# 80/20 split train and validation set
+sizeTrain = int(len(files)*0.8)
+sizeValidation = int(len(files)-sizeTrain)
+print("size trainset: "+str(sizeTrain) + ", size validation set:", sizeValidation)
+train = inputs[0:sizeTrain]
+validation = inputs[sizeTrain:len(files)]
+
+# ground truth: flatten data of item and 80/20 split
+train_ground_truth = ground_truth[0:sizeTrain].reshape((sizeTrain, -1))
+validation_ground_truth = ground_truth[sizeTrain:len(files)].reshape(sizeValidation, -1)
+
+
+#%% train the model
 
 # use sequential model
 model = keras.Sequential()
@@ -158,10 +176,9 @@ model.compile(optimizer=tf.train.AdamOptimizer(0.0001), loss='mean_squared_error
 #tensorboard = None
 
 # train the model
-history = model.fit(train, train_ground_truth, epochs=1, batch_size=50, validation_data=(validation, validation_ground_truth))
+history = model.fit(train, train_ground_truth, epochs=4, batch_size=50, validation_data=(validation, validation_ground_truth))
 
-
-#%%
+#%% show results
 # summarize history for loss
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
