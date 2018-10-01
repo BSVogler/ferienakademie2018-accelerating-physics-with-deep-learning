@@ -18,15 +18,15 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 # functions
 # make figure
 # make figure
-def plotter(x, y, index=-1):
+def plotter(predictionset, ground_truth, index=-1):
     """
-
-    :param x: predictions
-    :param y: ground truth
+    Plots various statistics on the training result..
+    :param predictionset: predictions
+    :param ground_truth: ground truth
     :param index: index 0 is best result, ordered descending
     :return:
     """
-    length = len(x)
+    length = len(predictionset)
     random_sample = np.random.random_integers(0, length - 1)
     if index > -1:
         random_sample = index
@@ -35,44 +35,44 @@ def plotter(x, y, index=-1):
     # predicted data
     plt.subplot(331)
     plt.title('Predicted pressure', fontsize=10)
-    plt.imshow(x[random_sample, :, :, 0], cmap='jet')  # vmin=-100,vmax=100, cmap='jet')
+    plt.imshow(predictionset[random_sample, :, :, 0], cmap='jet')  # vmin=-100,vmax=100, cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(332)
     plt.title('Predicted x velocity', fontsize=10)
-    plt.imshow(x[random_sample, :, :, 1], cmap='jet')
+    plt.imshow(predictionset[random_sample, :, :, 1], cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(333)
     plt.title('Predicted y velocity', fontsize=10)
-    plt.imshow(x[random_sample, :, :, 2], cmap='jet')
+    plt.imshow(predictionset[random_sample, :, :, 2], cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     # ground truth data
     plt.subplot(334)
     plt.title('Ground truth pressure', fontsize=10)
-    plt.imshow(y[random_sample, :, :, 0], cmap='jet')
+    plt.imshow(ground_truth[random_sample, :, :, 0], cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(335)
     plt.title('Ground truth x velocity', fontsize=10)
-    plt.imshow(y[random_sample, :, :, 1], cmap='jet')
+    plt.imshow(ground_truth[random_sample, :, :, 1], cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(336)
     plt.title('Ground truth y velocity', fontsize=10)
-    plt.imshow(y[random_sample, :, :, 2], cmap='jet')
+    plt.imshow(ground_truth[random_sample, :, :, 2], cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     # difference
     plt.subplot(337)
-    p = y[random_sample, :, :, 0] - x[random_sample, :, :, 0]
+    p = ground_truth[random_sample, :, :, 0] - predictionset[random_sample, :, :, 0]
     pmask = np.ma.masked_where(np.abs(p) <= 5e-3, p)
     plt.title('Difference pressure', fontsize=10)
     plt.imshow(pmask, cmap='jet')
@@ -80,7 +80,7 @@ def plotter(x, y, index=-1):
     plt.axis('off')
 
     plt.subplot(338)
-    vx = y[random_sample, :, :, 1] - x[random_sample, :, :, 1]
+    vx = ground_truth[random_sample, :, :, 1] - predictionset[random_sample, :, :, 1]
     vxmask = np.ma.masked_where(np.abs(vx) <= 5e-3, vx)
     plt.title('Difference x velocity', fontsize=10)
     plt.imshow(vxmask, cmap='jet')
@@ -88,33 +88,34 @@ def plotter(x, y, index=-1):
     plt.axis('off')
 
     plt.subplot(339)
-    vy = y[random_sample, :, :, 2] - x[random_sample, :, :, 2]
+    vy = ground_truth[random_sample, :, :, 2] - predictionset[random_sample, :, :, 2]
     vymask = np.ma.masked_where(np.abs(vy) <= 5e-3, vy)
     plt.title('Difference y velocity', fontsize=10)
     plt.imshow(vymask, cmap='jet')
     plt.colorbar()
     plt.axis('off')
+    plt.show()
 
     # relative error
     plt.figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
 
     plt.subplot(331)
     plt.title('Rel. error pressure', fontsize=10)
-    plt.imshow(np.abs(y[random_sample, :, :, 0] - x[random_sample, :, :, 0]) / np.abs(y[random_sample, :, :, 0]),
+    plt.imshow(np.abs(ground_truth[random_sample, :, :, 0] - predictionset[random_sample, :, :, 0]) / np.abs(ground_truth[random_sample, :, :, 0]),
                cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(332)
     plt.title('Rel. error x velocity', fontsize=10)
-    plt.imshow(np.abs(y[random_sample, :, :, 1] - x[random_sample, :, :, 1]) / np.abs(y[random_sample, :, :, 1]),
+    plt.imshow(np.abs(ground_truth[random_sample, :, :, 1] - predictionset[random_sample, :, :, 1]) / np.abs(ground_truth[random_sample, :, :, 1]),
                cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(333)
     plt.title('Rel. error y velocity', fontsize=10)
-    plt.imshow(np.abs(y[random_sample, :, :, 2] - x[random_sample, :, :, 2]) / np.abs(y[random_sample, :, :, 2]),
+    plt.imshow(np.abs(ground_truth[random_sample, :, :, 2] - predictionset[random_sample, :, :, 2]) / np.abs(ground_truth[random_sample, :, :, 2]),
                cmap='jet')
     plt.colorbar()
     plt.axis('off')
