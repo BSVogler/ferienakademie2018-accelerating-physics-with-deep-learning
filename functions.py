@@ -132,17 +132,17 @@ def error_distribution(truth, predictions, nbins=20):
     plt.show()
 
 
-# split test data
 def randsplit(inputs, targets, frac=.9):
-    '''splits a dataset into two bins
-    param inputs: input datasets
-    param targets: target datasets
-    param frac: fraction where the split is applied
-    return inputs1: first bin inputs
+    """
+    splits a dataset into two bins
+    :param inputs: dataset
+    :param targets: dataset
+    :param frac: fraction where the split is applied
+    :return:     return inputs1: first bin inputs
     return targets1: first bin targets
     return inputs2: second bin inputs
     return targets2: second bin targets
-    '''
+    """
     numElements = int(inputs.shape[0] * frac)
     indices = random.sample(range(0, inputs.shape[0]), numElements)
     mask = np.ones(inputs.shape[0], np.bool)
