@@ -194,11 +194,13 @@ def preprocess_data(inputs, targets, norm=1):
 
 # plot conv layer weights
 def plot_conv_weights(model, layer):
-    '''
+    """
+    plot conv layer weights
     :param model: nn model
     :param layer: index of layer as an integer
     :return: plot of convolution layer weights and shape of kernels and no. of weights
-    '''
+
+    """
     W = model.get_layer(index=layer).get_weights()[0]
     print('Kernel shape:', W.shape)
     if len(W.shape) == 4:
@@ -217,6 +219,12 @@ def plot_conv_weights(model, layer):
 
 
 def sizeof_fmt(num, suffix='B'):
+    """
+    bytes to human readable format
+    :param num:
+    :param suffix:
+    :return:
+    """
     for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
         if abs(num) < 1024.0:
             return "%3.1f%s%s" % (num, unit, suffix)
@@ -225,6 +233,11 @@ def sizeof_fmt(num, suffix='B'):
 
 
 def plot_trainingcurves(history):
+    """
+    Plots a curve.
+    :param history: returned by model.train
+    :return:
+    """
     # summarize history for loss
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])
@@ -233,6 +246,19 @@ def plot_trainingcurves(history):
     plt.xlabel('epoch')
     plt.legend(['train', 'validation'], loc='upper left')
     plt.show()
+
+def notify_macos(title, subtitle, message):
+    """
+
+    :param title:
+    :param subtitle:
+    :param message:
+    :return:
+    """
+    t = '-title {!r}'.format(title)
+    s = '-subtitle {!r}'.format(subtitle)
+    m = '-message {!r}'.format(message)
+    os.system('terminal-notifier {}'.format(' '.join([m, t, s])))
 
 
 def print_memory_usage(model):
