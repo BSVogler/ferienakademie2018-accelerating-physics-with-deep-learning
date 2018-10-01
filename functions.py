@@ -89,10 +89,10 @@ def plotter(x, y):
 
     plt.show()
 
-def relative_error(predictions,truth):
+def relative_error(truth,predictions):
     '''
-    :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
     :param truth: normalized ground truth, targets as [n_samples,64,64,3]
+    :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
     :return: relative error
     '''
     results=0*predictions
