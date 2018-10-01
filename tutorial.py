@@ -3,9 +3,9 @@ import tensorflow as tf
 from tensorflow import keras
 import matplotlib.pyplot as plt
 from os import listdir
-from keras.callbacks import TensorBoard
 
 from visualization import vis
+from peter import preprocess_data
 
 # load dataset
 dataDir = "./data/trainSmallFA/"
@@ -13,7 +13,6 @@ files = listdir(dataDir)
 files.sort()
 totalLength = len(files)
 inputs = np.empty((len(files), 3, 64, 64))
-print("Inputs:" + str(len(inputs)))
 ground_truth = np.empty((len(files), 3, 64, 64))
 
 # load
@@ -29,16 +28,8 @@ for i, file in enumerate(files):
 inputs = inputs.transpose(0, 2, 3, 1)
 ground_truth = ground_truth.transpose(0, 2, 3, 1)
 
-# 80/20 split
-sizeTrain = int(len(files)*0.8)
-sizeValidation = int(len(files)-sizeTrain)
-print("size trainset: "+str(sizeTrain))
-train = inputs[0:sizeTrain]
-validation = inputs[sizeTrain:len(files)]
+#%% draw the input data
 
-# flatten data of item and 80/20 split
-train_ground_truth = ground_truth[0:sizeTrain].reshape((sizeTrain, -1))
-validation_ground_truth = ground_truth[sizeTrain:len(files)].reshape(sizeValidation, -1)
 
 def drawFigure():
     # show first file
