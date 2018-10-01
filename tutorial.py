@@ -173,13 +173,8 @@ if __name__ == "__main__":
     # show results
     plot_trainingcurves(history)
     # apply the model on the data
-    predictions = model.predict(train[1, :], batch_size=1)
-    truth = ground_truth[1, :]
-
-    # print("predictions shape = ", predictions.shape)
-
-    # print("predictions shape = ", predictions.shape)
-
+    predictions = model.predict(train[0:1, :], batch_size=1)
+    truth = ground_truth[0:1, :]
 
     predictions = predictions.reshape(len(predictions),64,64,3)
     truth = truth.reshape(len(truth),64,64,3)
