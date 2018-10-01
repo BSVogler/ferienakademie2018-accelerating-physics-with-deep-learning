@@ -95,10 +95,19 @@ def relative_error(truth,predictions):
     :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
     :return: relative error
     '''
+    results=np.sum(np.abs(predictions - truth)) / np.sum(np.abs(truth))
+    return results
+
+def relative_error_multiple(truth,predictions):
+    '''
+    :param truth: normalized ground truth, targets as [n_samples,64,64,3]
+    :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
+    :return: relative error
+    '''
     results=0*predictions
     for i in range(0,predictions.shape[1]):
         results[i,:,:,:]=np.sum(np.abs(predictions[i,:,:,:] - truth[i,:,:,:])) / np.sum(np.abs(truth[i,:,:,:]))
-    return results
+
 
 
 # normalize data
