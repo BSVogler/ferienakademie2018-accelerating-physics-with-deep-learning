@@ -170,6 +170,15 @@ model.compile(optimizer=tf.train.AdamOptimizer(0.0001), loss='mean_squared_error
 history = model.fit(train, train_ground_truth, epochs=1, batch_size=50, validation_data=(validation, validation_ground_truth))
 
 
+#%%
+# summarize history for loss
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'validation'], loc='upper left')
+plt.show()
 
 # apply the model on the data
 k = 1
