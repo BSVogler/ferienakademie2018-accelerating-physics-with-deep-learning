@@ -23,6 +23,11 @@ print(os.getcwd())
 # functions
 # make figure
 def plotter(x, y):
+    '''
+    :param x: output of network, predictions
+    :param y: ground truth, targets
+    :return: plots in 3x4 outlay, preds., targets, differences, relative differences
+    '''
     length = len(x)
     random_sample = np.random.random_integers(0, length - 1)
     plt.figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
@@ -85,7 +90,7 @@ def plotter(x, y):
     plt.axis('off')
 
     plt.show()
-
+# normalize data
 def preprocess_data(inputs, targets, norm=1):
     """
     Normalizes the data.
@@ -121,28 +126,30 @@ def preprocess_data(inputs, targets, norm=1):
             normalized_inputs[:, ch, :, :] = inputs[:, ch, :, :] / input_max[ch]
             normalized_targets[:, ch, :, :] = targets[:, ch, :, :] / target_max[ch]
     return normalized_inputs, normalized_targets
-
-<<<<<<< HEAD
+# plot conv layer weights
 def plot_conv_weights(model, layer):
+    '''
+    :param model: nn model
+    :param layer: index of layer as an integer
+    :return: plot of convolution layer weights and shape of kernels and no. of weights
+    '''
     W = model.get_layer(index=layer).get_weights()[0]
-    print(W.shape)
+    print('Kernel shape:',W.shape)
     if len(W.shape) == 4:
         W = np.squeeze(W)
-        print(W.shape)
         w = W.shape[0]
         h = W.shape[1]
         channels = W.shape[2]
         filters = W.shape[3]
-        #W = W.reshape((w, h, W.shape[2]*W.shape[3]))
         fig, axs = plt.subplots(filters,channels, figsize=(20,20))
         fig.subplots_adjust(hspace = 1)
         axs = axs.ravel()
-        #axs = axs.yaxis.set_label_position("right")
         for i in range(channels*filters):
             axs[i].imshow(W[:,:,i%channels,i//channels])
             axs[i].set_title('Filter' + str(i//channels) + '\nFeature' +  str(i%channels))
         print('Number of trainable weights in layer:',w*h*channels*filters)
 #--------------------------------------------------------------------------------------------------
+#best working toy algorithm just keeping to have it
 dataDir = os.getcwd() + '/data/trainSmallFA'
 files = listdir(dataDir)
 
