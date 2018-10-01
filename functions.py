@@ -88,6 +88,19 @@ def plotter(x, y):
     plt.axis('off')
 
     plt.show()
+
+def relative_error(predictions,truth):
+    '''
+    :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
+    :param truth: normalized ground truth, targets as [n_samples,64,64,3]
+    :return: relative error
+    '''
+    results=0*predictions
+    for i in range(0,predictions.shape[1]):
+        results[i,:,:,:]=np.sum(np.abs(predictions[i,:,:,:] - truth[i,:,:,:])) / np.sum(np.abs(truth[i,:,:,:]))
+    return results
+
+
 # normalize data
 def preprocess_data(inputs, targets, norm=1):
     """
