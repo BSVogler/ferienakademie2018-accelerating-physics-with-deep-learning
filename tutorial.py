@@ -198,72 +198,7 @@ truth = train_ground_truth[0:k, :]
 # print("predictions shape = ", predictions.shape)
 
 
-def show_prediction(predictions):
-    """
-
-    :param predictions:
-    :return:
-    """
-    # make figure
-    plt.figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
-
-    # predicted data
-    plt.subplot(331)
-    plt.title('Predicted pressure')
-    plt.imshow(predictions[0, 0, :, :], cmap='jet')  # vmin=-100,vmax=100, cmap='jet')
-    plt.colorbar()
-    plt.subplot(332)
-    plt.title('Predicted x velocity')
-    plt.imshow(predictions[0, 1, :, :], cmap='jet')
-    plt.colorbar()
-    plt.subplot(333)
-    plt.title('Predicted y velocity')
-    plt.imshow(predictions[0, 2, :, :], cmap='jet')
-    plt.colorbar()
-
-    # ground truth data
-    plt.subplot(334)
-    plt.title('Ground truth pressure')
-    plt.imshow(truth[0, 0, :, :], cmap='jet')
-    plt.colorbar()
-    plt.subplot(335)
-    plt.title('Ground truth x velocity')
-    plt.imshow(truth[0, 1, :, :], cmap='jet')
-    plt.colorbar()
-    plt.subplot(336)
-    plt.title('Ground truth y velocity')
-    plt.imshow(truth[0, 2, :, :], cmap='jet')
-    plt.colorbar()
-
-    # difference
-    plt.subplot(337)
-    plt.title('Difference pressure')
-    plt.imshow((truth[0, 0, :, :] - predictions[0, 0, :, :]), cmap='jet')
-    plt.colorbar()
-    plt.subplot(338)
-    plt.title('Difference x velocity')
-    plt.imshow((truth[0, 1, :, :] - predictions[0, 1, :, :]), cmap='jet')
-    plt.colorbar()
-    plt.subplot(339)
-    plt.title('Difference y velocity')
-    plt.imshow((truth[0, 2, :, :] - predictions[0, 2, :, :]), cmap='jet')
-    plt.colorbar()
-
-    plt.show()
-    # output layout:
-    # [0] 'Predicted pressure'
-    # [1] 'Predicted x velocity'
-    # [2] 'Predicted y velocity'
-    # [3] 'Ground truth pressure'
-    # [4] 'Ground truth x velocity'
-    # [5] 'Ground truth y velocity'
-    # [6] 'Difference pressure'
-    # [7] 'Difference x velocity'
-    # [8] 'Difference y velocity'
-
-#%%
 predictions = predictions.reshape(len(predictions),64,64,3)
 truth = truth.reshape(len(truth),64,64,3)
 
 vis(predictions[0,:], truth[0,:])
-#show_prediction(predictions)
