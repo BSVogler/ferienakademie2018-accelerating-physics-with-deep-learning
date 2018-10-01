@@ -16,7 +16,7 @@ from os import listdir
 import sys
 sys.path.insert(0, 'C:/Users/pkicsiny/Desktop/FA2018/tutorials/ferienakademie2018-accelerating-physics-with-deep-learning/')
 from functions import *
-
+import random
 # forces CPU usage
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
@@ -95,9 +95,9 @@ def plotter(x, y):
 
 def relative_error(truth,predictions):
     '''
-    :param truth: normalized ground truth, targets as [n_samples,64,64,3]
-    :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
-    :return: relative error
+    :param truth: normalized ground truth, targets as [64,64,3]
+    :param predictions: normalized output of network, predictions as [64,64,3]
+    :return: relative error(scalar)
     '''
     results=np.sum(np.abs(predictions - truth)) / np.sum(np.abs(truth))
     return results
@@ -107,11 +107,52 @@ def relative_error_multiple(truth,predictions):
     '''
     :param truth: normalized ground truth, targets as [n_samples,64,64,3]
     :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
-    :return: relative error
+    :return: relative error(array)
     '''
-    results=0*predictions
-    for i in range(0,predictions.shape[1]):
-        results[i,:,:,:]=np.sum(np.abs(predictions[i,:,:,:] - truth[i,:,:,:])) / np.sum(np.abs(truth[i,:,:,:]))
+    results=np.zeros(predictions.shape[0])
+    for i in range(0,predictions.shape[0]):
+        results[i]=np.sum(np.abs(predictions[i,:,:,:] - truth[i,:,:,:])) / np.sum(np.abs(truth[i,:,:,:]))
+    return results
+
+
+def error_distribution(truth,predictions,nbins=20):
+    '''
+    'param truth: normalized ground truth, targets as [n_samples,64,64,3]
+    'param predictions: normalized output of network, predictions as [n_samples,64,64,3]
+    'return: nothing (plots relative error distributions)
+    '''
+    errors=relative_error_multiple(truth,predictions)
+    plt.hist(errors,nbins)
+    plt.xlabel('relative error')
+    plt.ylabel('occurences')
+    plt.title('mean = '+str(np.mean(errors))[0:5]+', min = '+str(np.min(errors))[0:5]+', max = '+str(np.max(errors))[0:5])
+    plt.show()
+
+
+ 
+
+#split test data
+def randsplit(inputs,targets,frac=.9):
+    '''splits a dataset into two bins
+    param inputs: input datasets
+    param targets: target datasets
+    param frac: fraction where the split is applied
+    return inputs1: first bin inputs
+    return targets1: first bin targets
+    return inputs2: second bin inputs
+    return targets2: second bin targets
+    '''
+    numElements=int(inputs.shape[0]*frac)
+    indices=random.sample(range(0, inputs.shape[0]), numElements)
+    mask = np.ones(inputs.shape[0], np.bool)
+    mask[indices] = 0
+    inputs1=inputs[indices,:,:,:]
+    inputs2=inputs[mask,:,:,:]
+    targets1=targets[indices,:,:,:]
+    targets2=targets[mask,:,:,:]
+    return inputs1,targets1,inputs2,targets2
+
+
 
 # normalize data
 def preprocess_data(inputs, targets, norm=1):
