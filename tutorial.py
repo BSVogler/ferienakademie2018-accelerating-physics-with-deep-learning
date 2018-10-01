@@ -170,7 +170,11 @@ if __name__ == "__main__":
     # train the model
     history = model.fit(train, train_ground_truth, epochs=10, batch_size=50, validation_data=(validation, validation_ground_truth))
 
-    #%% show results
+    notify_macos(title='Deep Learning is done.',
+                 subtitle='Final loss: ' + str(history.history['loss'][-1]),
+                 message='Trained ' + str(epochs) + ' epochs.')
+
+    # show results
     plot_trainingcurves(history)
     # apply the model on the data
     k = 1
@@ -186,8 +190,3 @@ if __name__ == "__main__":
     truth = truth.reshape(len(truth),64,64,3)
 
     vis(predictions[0,:], truth[0,:])
-
-    # Calling the function
-    notify_macos(title='Training is done.',
-           subtitle='Final loss: '+history.history,
-           message='Hello, this is me, notifying you!')
