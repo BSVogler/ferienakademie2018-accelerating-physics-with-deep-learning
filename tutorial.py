@@ -88,7 +88,7 @@ if __name__ == "__main__":
     #%% draw the input data
     # draw_input(inputs,ground_truth, 0)
 
-    #%% split into sets
+    # split into sets
     # 80/20 split train and validation set
     sizeTrain = int(len(files)*0.8)
     sizeValidation = int(len(files)-sizeTrain)
@@ -129,16 +129,16 @@ if __name__ == "__main__":
                                   padding='valid',
                                   data_format = "channels_last",
                                  activation = 'tanh'))
-    model.add(keras.layers.Conv2D(input_shape = (16,16,3),
+    model.add(keras.layers.Conv2D(input_shape = (16,16,f1),
                                   filters = f2,
                                   kernel_size=(k2,k2),
                                   strides=(s2, s2),
                                   padding='same',
                                   data_format = "channels_last",
                                  activation = 'tanh'))
-    model.add(keras.layers.Conv2D(input_shape=(16, 16, 3),
+    model.add(keras.layers.Conv2D(input_shape=(8, 8, f2),
                                   filters=3,
-                                  kernel_size=(16, 16),
+                                  kernel_size=(8, 8),
                                   strides=(1, 1),
                                   padding='same',
                                   data_format="channels_last",
@@ -151,13 +151,15 @@ if __name__ == "__main__":
     layer1Dim = 12 * 12 * 3
     layer2Dim = 64 * 64 * 3
 
-    model.add(keras.layers.Dense(layer1Dim, activation='relu'))
+    #model.add(keras.layers.Dense(layer1Dim, activation='relu'))
 
     model.add(keras.layers.Dense(64 * 64 * 3))
 
     # configure the model
     model.compile(optimizer=tf.train.AdamOptimizer(0.0001), loss='mean_squared_error', metrics=['accuracy'])
     # AdamOptimizer(0.0006)
+    model.summary()
+
     print_memory_usage(model)
 
     # train the model
