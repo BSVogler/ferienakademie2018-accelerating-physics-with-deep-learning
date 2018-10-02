@@ -283,6 +283,13 @@ def plot_conv_weights(model, layer):
         fig.show()
 
 
+def plot_var_kernel(model, layerindex, channel=0):
+    weights = model.get_layer(index=layerindex).get_weights()[0]
+    var = np.var(weights, axis=(3))
+    plt.imshow(var[:, :, channel])
+    plt.colorbar()
+    plt.show()
+
 def sizeof_fmt(num, suffix='B'):
     """
     bytes to human readable format
