@@ -256,6 +256,9 @@ def plot_conv_weights(model, layer):
     :return: plot of convolution layer weights and shape of kernels and no. of weights
 
     """
+    if len(model.get_layer(index=layer).get_weights()) == 0:
+        print("layer has no weights")
+        return
     W = model.get_layer(index=layer).get_weights()[0]
     print('Kernel shape:', W.shape)
     if len(W.shape) == 4:
