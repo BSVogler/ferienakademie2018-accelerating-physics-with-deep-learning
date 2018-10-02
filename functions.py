@@ -11,6 +11,7 @@ from os import listdir
 import sys
 from functions import *
 import random
+
 # forces CPU usage
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
@@ -33,24 +34,24 @@ def plotter(predictionset, ground_truth, index=-1):
     plt.subplot(331)
     plt.title('Predicted pressure', fontsize=10)
     plt.imshow(predictionset[random_sample, :, :, 0], cmap='jet',
-               vmin=ground_truth[random_sample,:,:,0].min(),
-               vmax=ground_truth[random_sample,:,:,0].max())
+               vmin=ground_truth[random_sample, :, :, 0].min(),
+               vmax=ground_truth[random_sample, :, :, 0].max())
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(332)
     plt.title('Predicted x velocity', fontsize=10)
     plt.imshow(predictionset[random_sample, :, :, 1], cmap='jet',
-               vmin=ground_truth[random_sample,:,:,1].min(),
-               vmax=ground_truth[random_sample,:,:,1].max())
+               vmin=ground_truth[random_sample, :, :, 1].min(),
+               vmax=ground_truth[random_sample, :, :, 1].max())
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(333)
     plt.title('Predicted y velocity', fontsize=10)
     plt.imshow(predictionset[random_sample, :, :, 2], cmap='jet',
-               vmin=ground_truth[random_sample,:,:,2].min(),
-               vmax=ground_truth[random_sample,:,:,2].max())
+               vmin=ground_truth[random_sample, :, :, 2].min(),
+               vmax=ground_truth[random_sample, :, :, 2].max())
     plt.colorbar()
     plt.axis('off')
 
@@ -104,21 +105,24 @@ def plotter(predictionset, ground_truth, index=-1):
 
     plt.subplot(331)
     plt.title('Rel. error pressure', fontsize=10)
-    plt.imshow(np.abs(ground_truth[random_sample, :, :, 0] - predictionset[random_sample, :, :, 0]) / np.abs(ground_truth[random_sample, :, :, 0]),
+    plt.imshow(np.abs(ground_truth[random_sample, :, :, 0] - predictionset[random_sample, :, :, 0]) / np.abs(
+        ground_truth[random_sample, :, :, 0]),
                cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(332)
     plt.title('Rel. error x velocity', fontsize=10)
-    plt.imshow(np.abs(ground_truth[random_sample, :, :, 1] - predictionset[random_sample, :, :, 1]) / np.abs(ground_truth[random_sample, :, :, 1]),
+    plt.imshow(np.abs(ground_truth[random_sample, :, :, 1] - predictionset[random_sample, :, :, 1]) / np.abs(
+        ground_truth[random_sample, :, :, 1]),
                cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(333)
     plt.title('Rel. error y velocity', fontsize=10)
-    plt.imshow(np.abs(ground_truth[random_sample, :, :, 2] - predictionset[random_sample, :, :, 2]) / np.abs(ground_truth[random_sample, :, :, 2]),
+    plt.imshow(np.abs(ground_truth[random_sample, :, :, 2] - predictionset[random_sample, :, :, 2]) / np.abs(
+        ground_truth[random_sample, :, :, 2]),
                cmap='jet')
     plt.colorbar()
     plt.axis('off')
@@ -225,20 +229,20 @@ def normalize_data(inputs, targets, norm=1):
                 normalized_inputs[:, ch, :, :] = inputs[:, ch, :, :] / input_max[ch]
                 normalized_targets[:, ch, :, :] = targets[:, ch, :, :] / target_max[ch]
 
-    elif norm == 1: #Nils normalization
+    elif norm == 1:  # Nils normalization
         vxmax = np.empty(len(inputs))
         vymax = np.empty(len(inputs))
-        for s in range(0,len(inputs)):
-            #step 1
+        for s in range(0, len(inputs)):
+            # step 1
             vxmax[s] = inputs[s, 0, :, :].max()
             vymax[s] = inputs[s, 1, :, :].max()
             magnitude = np.sqrt(vxmax[s] ** 2 + vymax[s] ** 2)
-            #step 2
-            normalized_targets[s,1,:,:] = targets[s,1,:,:]/ magnitude
+            # step 2
+            normalized_targets[s, 1, :, :] = targets[s, 1, :, :] / magnitude
             normalized_targets[s, 2, :, :] = targets[s, 2, :, :] / magnitude
-            #step3
-            normalized_targets[s,0,:,:] = targets[s, 0, :, :] / magnitude**2
-            #inputs stay the same
+            # step3
+            normalized_targets[s, 0, :, :] = targets[s, 0, :, :] / magnitude ** 2
+            # inputs stay the same
             normalized_inputs = inputs
     return normalized_inputs, normalized_targets
 
@@ -282,7 +286,8 @@ def sizeof_fmt(num, suffix='B'):
         num /= 1024.0
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
-#plot loss function evolution
+
+# plot loss function evolution
 def plot_trainingcurves(history):
     """
     Plots a curve.
@@ -312,10 +317,10 @@ def notify_macos(title, subtitle, message):
     m = '-message {!r}'.format(message)
     os.system('terminal-notifier {}'.format(' '.join([m, t, s])))
 
-#calculate memory usage of weights
+
 def print_memory_usage(model):
     """
-    calculate number weights and memory
+    calculate number of weights and memory of the model.
     :param model:
     :return:
     """
@@ -331,17 +336,17 @@ def print_memory_usage(model):
 
     print(str(sumWeights) + " weights use " + str(sizeof_fmt(memory)))
 
-#orders predictions according to their rel. error
-def arg_getter(truth,predictions):
-    '''
 
+def arg_getter(truth, predictions):
+    '''
+    orders predictions according to their rel. error
     :param truth: ground truth
     :param predictions: output from network
     :return: list of ordered sample indices in decreasing order
     '''
-    test = relative_error_multiple(truth,predictions)
+    test = relative_error_multiple(truth, predictions)
     sort = np.asarray(sorted(test))
     print(test.argmax())
     sorted_args = [list(test).index(error) for error in sort]
-    #decreasing order, arg 0 is the best, -1 is the worst
+    # decreasing order, arg 0 is the best, -1 is the worst
     return sorted_args
