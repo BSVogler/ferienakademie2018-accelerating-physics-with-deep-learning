@@ -108,7 +108,7 @@ def plotter(predictionset, ground_truth, index=-1):
     eps = 1e-6
     plt.subplot(331)
     plt.title('Rel. error pressure', fontsize=10)
-    relerr = np.abs(ground_truth[sampleindex, :, :, 0]-predictionset[random_sample, :, :, 0]) /\
+    relerr = np.abs(ground_truth[sampleindex, :, :, 0]-predictionset[sampleindex, :, :, 0]) /\
              np.abs(ground_truth[sampleindex,:, :, 0])
     relerrmask = np.ma.masked_where(relerr == np.Inf, relerr)
     plt.imshow(relerrmask,cmap='jet')
@@ -117,7 +117,7 @@ def plotter(predictionset, ground_truth, index=-1):
 
     plt.subplot(332)
     plt.title('Rel. error x velocity', fontsize=10)
-    relerr = np.abs(ground_truth[sampleindex, :, :, 1]-predictionset[random_sample, :, :, 1]) /\
+    relerr = np.abs(ground_truth[sampleindex, :, :, 1]-predictionset[sampleindex, :, :, 1]) /\
              np.abs(ground_truth[sampleindex,:, :, 1])
     relerrmask = np.ma.masked_where(relerr == np.Inf, relerr)
     plt.imshow(relerrmask,cmap='jet')
@@ -126,7 +126,7 @@ def plotter(predictionset, ground_truth, index=-1):
 
     plt.subplot(333)
     plt.title('Rel. error y velocity', fontsize=10)
-    relerr = np.abs(ground_truth[sampleindex, :, :, 2]-predictionset[random_sample, :, :, 2]) /\
+    relerr = np.abs(ground_truth[sampleindex, :, :, 2]-predictionset[sampleindex, :, :, 2]) /\
              np.abs(ground_truth[sampleindex,:, :, 2])
     relerrmask = np.ma.masked_where(relerr == np.Inf, relerr)
     plt.imshow(relerrmask,cmap='jet')
