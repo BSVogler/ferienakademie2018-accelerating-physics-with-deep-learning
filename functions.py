@@ -278,7 +278,7 @@ def plot_conv_weights(model, layer):
         axs = axs.ravel()
         for i in range(channels * filters):
             axs[i].imshow(weights[:, :, i % channels, i // channels])
-            axs[i].set_title('Filter' + str(i // channels) + '\nFeature' + str(i % channels))
+            #axs[i].set_title('Filter' + str(i // channels) + '\nFeature' + str(i % channels))
         print('Number of trainable weights in layer:', width * height * channels * filters)
         fig.show()
 
