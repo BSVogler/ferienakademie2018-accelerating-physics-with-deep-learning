@@ -105,28 +105,31 @@ def plotter(predictionset, ground_truth, index=-1):
     # relative error
     plt.figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
 
-    eps = 1e-6
+    eps = 1e-5
     plt.subplot(331)
     plt.title('Rel. error pressure', fontsize=10)
-    plt.imshow(np.abs(ground_truth[sampleindex, :, :, 0] - predictionset[random_sample, :, :, 0]) / np.abs(
-        ground_truth[sampleindex, :, :, 0] + eps),
-               cmap='jet')
+    relerr = np.abs(ground_truth[sampleindex, :, :, 0]-predictionset[sampleindex, :, :, 0]) /\
+             np.abs(ground_truth[sampleindex,:, :, 0] + eps)
+    relerrmask = np.ma.masked_where(relerr > 1e6, relerr)
+    plt.imshow(relerrmask,cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(332)
     plt.title('Rel. error x velocity', fontsize=10)
-    plt.imshow(np.abs(ground_truth[sampleindex, :, :, 1] - predictionset[random_sample, :, :, 1]) / np.abs(
-        ground_truth[sampleindex, :, :, 1] + eps),
-               cmap='jet')
+    relerr = np.abs(ground_truth[sampleindex, :, :, 1]-predictionset[sampleindex, :, :, 1]) /\
+             np.abs(ground_truth[sampleindex,:, :, 1] + eps)
+    relerrmask = np.ma.masked_where(relerr > 1e6, relerr)
+    plt.imshow(relerrmask,cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(333)
     plt.title('Rel. error y velocity', fontsize=10)
-    plt.imshow(np.abs(ground_truth[sampleindex, :, :, 2] - predictionset[random_sample, :, :, 2]) / np.abs(
-        ground_truth[sampleindex, :, :, 2] + eps),
-               cmap='jet')
+    relerr = np.abs(ground_truth[sampleindex, :, :, 2] - predictionset[sampleindex, :, :, 2]) /\
+             np.abs(ground_truth[sampleindex,:, :, 2] + eps)
+    relerrmask = np.ma.masked_where(relerr > 1e6, relerr)
+    plt.imshow(relerrmask,cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
