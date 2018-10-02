@@ -268,7 +268,7 @@ def plot_conv_weights(model, layer):
     print('Kernel shape:', weights.shape)
     # has four dimensions?
     if len(weights.shape) == 4:
-        weights = np.squeeze(weights)
+        weights = np.squeeze(weights) #usually the weights do not contain 1d entries, so why is this needed?
         width = weights.shape[0]
         height = weights.shape[1]
         channels = weights.shape[2]
