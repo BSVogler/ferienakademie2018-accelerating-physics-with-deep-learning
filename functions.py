@@ -15,9 +15,6 @@ import random
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 
-# functions
-# make figure
-# make figure
 def plotter(predictionset, ground_truth, index=-1):
     """
     Plots various statistics on the training result..
@@ -130,33 +127,36 @@ def plotter(predictionset, ground_truth, index=-1):
 
 
 def relative_error(truth, predictions):
-    '''
+    """
+
     :param truth: normalized ground truth, targets as [64,64,3]
     :param predictions: normalized output of network, predictions as [64,64,3]
     :return: relative error(scalar)
-    '''
+    """
     results = np.sum(np.abs(predictions - truth)) / np.sum(np.abs(truth))
     return results
 
 
 def relative_error_multiple(truth, predictions):
-    '''
+    """
+
     :param truth: normalized ground truth, targets as [n_samples,64,64,3]
     :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
     :return: relative error(array)
-    '''
+    """
     results = np.zeros(predictions.shape[0])
     for i in range(0, predictions.shape[0]):
         results[i] = np.sum(np.abs(predictions[i, :, :, :] - truth[i, :, :, :])) / np.sum(np.abs(truth[i, :, :, :]))
     return results
 
-#plot relative error dist. of results
+
 def error_distribution(truth, predictions, nbins=20):
-    '''
+    """
+    plot relative error dist. of results
     'param truth: normalized ground truth, targets as [n_samples,64,64,3]
     'param predictions: normalized output of network, predictions as [n_samples,64,64,3]
     'return: nothing (plots relative error distributions)
-    '''
+    """
     errors = relative_error_multiple(truth, predictions)
     plt.hist(errors, nbins)
     plt.xlabel('relative error')
