@@ -105,7 +105,7 @@ def plotter(predictionset, ground_truth, index=-1):
     # relative error
     plt.figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
 
-    eps = 1e-4
+    eps = 1e-5
     plt.subplot(331)
     plt.title('Rel. error pressure', fontsize=10)
     relerr = np.abs(ground_truth[sampleindex, :, :, 0]-predictionset[sampleindex, :, :, 0]) /\
