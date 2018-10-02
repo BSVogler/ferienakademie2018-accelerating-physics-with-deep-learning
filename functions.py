@@ -25,58 +25,60 @@ def plotter(predictionset, ground_truth, index=-1):
     :return:
     """
     length = len(predictionset)
-    random_sample = np.random.random_integers(0, length - 1)
     if index > -1:
-        random_sample = index
+        sampleindex = index
+    else:
+        sampleindex = np.random.random_integers(0, length - 1)
+
     plt.figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
-    print(random_sample)
+    print(sampleindex)
     # predicted data
     plt.subplot(331)
     plt.title('Predicted pressure', fontsize=10)
-    plt.imshow(predictionset[random_sample, :, :, 0], cmap='jet',
-               vmin=ground_truth[random_sample, :, :, 0].min(),
-               vmax=ground_truth[random_sample, :, :, 0].max())
+    plt.imshow(predictionset[sampleindex, :, :, 0], cmap='jet',
+               vmin=ground_truth[sampleindex, :, :, 0].min(),
+               vmax=ground_truth[sampleindex, :, :, 0].max())
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(332)
     plt.title('Predicted x velocity', fontsize=10)
-    plt.imshow(predictionset[random_sample, :, :, 1], cmap='jet',
-               vmin=ground_truth[random_sample, :, :, 1].min(),
-               vmax=ground_truth[random_sample, :, :, 1].max())
+    plt.imshow(predictionset[sampleindex, :, :, 1], cmap='jet',
+               vmin=ground_truth[sampleindex, :, :, 1].min(),
+               vmax=ground_truth[sampleindex, :, :, 1].max())
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(333)
     plt.title('Predicted y velocity', fontsize=10)
-    plt.imshow(predictionset[random_sample, :, :, 2], cmap='jet',
-               vmin=ground_truth[random_sample, :, :, 2].min(),
-               vmax=ground_truth[random_sample, :, :, 2].max())
+    plt.imshow(predictionset[sampleindex, :, :, 2], cmap='jet',
+               vmin=ground_truth[sampleindex, :, :, 2].min(),
+               vmax=ground_truth[sampleindex, :, :, 2].max())
     plt.colorbar()
     plt.axis('off')
 
     # ground truth data
     plt.subplot(334)
     plt.title('Ground truth pressure', fontsize=10)
-    plt.imshow(ground_truth[random_sample, :, :, 0], cmap='jet')
+    plt.imshow(ground_truth[sampleindex, :, :, 0], cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(335)
     plt.title('Ground truth x velocity', fontsize=10)
-    plt.imshow(ground_truth[random_sample, :, :, 1], cmap='jet')
+    plt.imshow(ground_truth[sampleindex, :, :, 1], cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(336)
     plt.title('Ground truth y velocity', fontsize=10)
-    plt.imshow(ground_truth[random_sample, :, :, 2], cmap='jet')
+    plt.imshow(ground_truth[sampleindex, :, :, 2], cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     # difference
     plt.subplot(337)
-    p = ground_truth[random_sample, :, :, 0] - predictionset[random_sample, :, :, 0]
+    p = ground_truth[sampleindex, :, :, 0] - predictionset[sampleindex, :, :, 0]
     pmask = np.ma.masked_where(np.abs(p) <= 5e-3, p)
     plt.title('Difference pressure', fontsize=10)
     plt.imshow(pmask, cmap='jet')
@@ -84,7 +86,7 @@ def plotter(predictionset, ground_truth, index=-1):
     plt.axis('off')
 
     plt.subplot(338)
-    vx = ground_truth[random_sample, :, :, 1] - predictionset[random_sample, :, :, 1]
+    vx = ground_truth[sampleindex, :, :, 1] - predictionset[sampleindex, :, :, 1]
     vxmask = np.ma.masked_where(np.abs(vx) <= 5e-3, vx)
     plt.title('Difference x velocity', fontsize=10)
     plt.imshow(vxmask, cmap='jet')
@@ -92,7 +94,7 @@ def plotter(predictionset, ground_truth, index=-1):
     plt.axis('off')
 
     plt.subplot(339)
-    vy = ground_truth[random_sample, :, :, 2] - predictionset[random_sample, :, :, 2]
+    vy = ground_truth[sampleindex, :, :, 2] - predictionset[sampleindex, :, :, 2]
     vymask = np.ma.masked_where(np.abs(vy) <= 5e-3, vy)
     plt.title('Difference y velocity', fontsize=10)
     plt.imshow(vymask, cmap='jet')
@@ -105,24 +107,24 @@ def plotter(predictionset, ground_truth, index=-1):
 
     plt.subplot(331)
     plt.title('Rel. error pressure', fontsize=10)
-    plt.imshow(np.abs(ground_truth[random_sample, :, :, 0] - predictionset[random_sample, :, :, 0]) / np.abs(
-        ground_truth[random_sample, :, :, 0]),
+    plt.imshow(np.abs(ground_truth[sampleindex, :, :, 0] - predictionset[sampleindex, :, :, 0]) / np.abs(
+        ground_truth[sampleindex, :, :, 0]),
                cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(332)
     plt.title('Rel. error x velocity', fontsize=10)
-    plt.imshow(np.abs(ground_truth[random_sample, :, :, 1] - predictionset[random_sample, :, :, 1]) / np.abs(
-        ground_truth[random_sample, :, :, 1]),
+    plt.imshow(np.abs(ground_truth[sampleindex, :, :, 1] - predictionset[sampleindex, :, :, 1]) / np.abs(
+        ground_truth[sampleindex, :, :, 1]),
                cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(333)
     plt.title('Rel. error y velocity', fontsize=10)
-    plt.imshow(np.abs(ground_truth[random_sample, :, :, 2] - predictionset[random_sample, :, :, 2]) / np.abs(
-        ground_truth[random_sample, :, :, 2]),
+    plt.imshow(np.abs(ground_truth[sampleindex, :, :, 2] - predictionset[sampleindex, :, :, 2]) / np.abs(
+        ground_truth[sampleindex, :, :, 2]),
                cmap='jet')
     plt.colorbar()
     plt.axis('off')
@@ -259,22 +261,23 @@ def plot_conv_weights(model, layer):
     if len(model.get_layer(index=layer).get_weights()) == 0:
         print("layer has no weights")
         return
-    W = model.get_layer(index=layer).get_weights()[0]
-    print('Kernel shape:', W.shape)
-    if len(W.shape) == 4:
-        W = np.squeeze(W)
-        w = W.shape[0]
-        h = W.shape[1]
-        channels = W.shape[2]
-        filters = W.shape[3]
+    weights = model.get_layer(index=layer).get_weights()[0]
+    print('Kernel shape:', weights.shape)
+    # has four dimensions?
+    if len(weights.shape) == 4:
+        weights = np.squeeze(weights)
+        width = weights.shape[0]
+        height = weights.shape[1]
+        channels = weights.shape[2]
+        filters = weights.shape[3]
         fig, axs = plt.subplots(filters, channels, figsize=(20, 20))
         fig.subplots_adjust(hspace=1)
         axs = axs.ravel()
         for i in range(channels * filters):
-            axs[i].imshow(W[:, :, i % channels, i // channels])
+            axs[i].imshow(weights[:, :, i % channels, i // channels])
             axs[i].set_title('Filter' + str(i // channels) + '\nFeature' + str(i % channels))
-        print('Number of trainable weights in layer:', w * h * channels * filters)
-
+        print('Number of trainable weights in layer:', width * height * channels * filters)
+        fig.show()
 
 def sizeof_fmt(num, suffix='B'):
     """
