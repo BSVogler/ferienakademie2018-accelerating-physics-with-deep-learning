@@ -140,6 +140,8 @@ def relative_error(truth, predictions):
     :return: relative error(scalar)
     """
     results = np.sum(np.abs(predictions - truth)) / np.sum(np.abs(truth))
+    if results == np.Inf:
+        print("infinity reached")
     return results
 
 
