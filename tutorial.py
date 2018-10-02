@@ -96,74 +96,53 @@ if __name__ == "__main__":
     train = inputs
     #validation = inputs[sizeTrain:len(files)]
 
-    # ground truth: flatten data of item and 80/20 split
-    ground_truth = ground_truth[:].reshape((len(ground_truth), -1))
+    # ground truth: flatten data (when last layer is flat)
+    #ground_truth = ground_truth[:].reshape((len(ground_truth), -1))
     #validation_ground_truth = ground_truth[sizeTrain:len(files)].reshape(sizeValidation, -1)
 
 
     #%% train the model
 
-    # use sequential model
-    model = keras.Sequential()
+    init = keras.layers.Input(shape=(64, 64, 3))
+    ConvDown1 = keras.layers.Conv2D(filters=64, kernel_size=(4, 4), strides=(2, 2), padding="same", activation='relu')(
+        init)
+    ConvDown2 = keras.layers.Conv2D(filters=128, kernel_size=(4, 4), strides=(2, 2), padding="same", activation='relu')(
+        ConvDown1)
+    ConvDown3 = keras.layers.Conv2D(filters=256, kernel_size=(4, 4), strides=(2, 2), padding="same", activation='relu')(
+        ConvDown2)
+    ConvDown4 = keras.layers.Conv2D(filters=512, kernel_size=(4, 4), strides=(2, 2), padding="same", activation='relu')(
+        ConvDown3)
+    ConvDown5 = keras.layers.Conv2D(filters=512, kernel_size=(4, 4), strides=(2, 2), padding="same", activation='relu')(
+        ConvDown4)
+    ConvDown6 = keras.layers.Conv2D(filters=512, kernel_size=(4, 4), strides=(2, 2), padding="same", activation='relu')(
+        ConvDown5)
 
-    #convolution filters
-    f1 = 8
-    f2 = 3
-    #kernel size
-    k1 = 4
-    k2 = 2
-    #stride
-    s1 = 4
-    s2 = 2
-    #padding
-    p1 = 0
-    p2 = 0
-    #output shape
-    o1 = ((64 - k1) + 2*p1)/s1 + 1
-    o2 = ((o1 - k2) + 2*p2)/s2 + 1
+    ConvUp1 = keras.layers.Conv2DTranspose(filters=512, kernel_size=(4, 4), strides=(2, 2), padding="same",
+                                           activation='relu')(ConvDown6)
+    merge1 = keras.layers.concatenate([ConvDown5, ConvUp1], axis=-1)
+    ConvUp2 = keras.layers.Conv2DTranspose(filters=512, kernel_size=(4, 4), strides=(2, 2), padding="same",
+                                           activation='relu')(merge1)
+    merge2 = keras.layers.concatenate([ConvDown4, ConvUp2], axis=-1)
+    ConvUp3 = keras.layers.Conv2DTranspose(filters=256, kernel_size=(4, 4), strides=(2, 2), padding="same",
+                                           activation='relu')(merge2)
+    merge3 = keras.layers.concatenate([ConvDown3, ConvUp3], axis=-1)
+    ConvUp4 = keras.layers.Conv2DTranspose(filters=128, kernel_size=(4, 4), strides=(2, 2), padding="same",
+                                           activation='relu')(merge3)
+    merge4 = keras.layers.concatenate([ConvDown2, ConvUp4], axis=-1)
+    ConvUp5 = keras.layers.Conv2DTranspose(filters=64, kernel_size=(4, 4), strides=(2, 2), padding="same",
+                                           activation='relu')(merge4)
+    merge5 = keras.layers.concatenate([ConvDown1, ConvUp5], axis=-1)
+    ConvUp6 = keras.layers.Conv2DTranspose(filters=3, kernel_size=(4, 4), strides=(2, 2), padding="same",
+                                           activation='elu')(merge5)
+    model = keras.models.Model(inputs=init, outputs=ConvUp6)
 
-    model.add(keras.layers.Conv2D(input_shape = (64,64,3),
-                                  filters = f1,
-                                  kernel_size=(k1,k1),
-                                  strides=(s1, s1),
-                                  padding='valid',
-                                  data_format = "channels_last",
-                                 activation = 'tanh'))
-    model.add(keras.layers.Conv2D(input_shape = (16,16,f1),
-                                  filters = f2,
-                                  kernel_size=(k2,k2),
-                                  strides=(s2, s2),
-                                  padding='same',
-                                  data_format = "channels_last",
-                                 activation = 'tanh'))
-    model.add(keras.layers.Conv2D(input_shape=(8, 8, f2),
-                                  filters=3,
-                                  kernel_size=(8, 8),
-                                  strides=(1, 1),
-                                  padding='same',
-                                  data_format="channels_last",
-                                  activation='tanh'))
-    model.add(keras.layers.UpSampling2D(size=(4, 4), data_format="channels_last"))
-    model.add(keras.layers.Flatten())
-
-    # just one fully connected layer
-    inputdim = 64*64*3
-    layer1Dim = 12 * 12 * 3
-    layer2Dim = 64 * 64 * 3
-
-    #model.add(keras.layers.Dense(layer1Dim, activation='relu'))
-
-    model.add(keras.layers.Dense(64 * 64 * 3))
-
-    # configure the model
     model.compile(optimizer=tf.train.AdamOptimizer(0.0001), loss='mean_squared_error', metrics=['accuracy'])
     # AdamOptimizer(0.0006)
-    model.summary()
 
     print_memory_usage(model)
 
     # train the model
-    epochs = 15
+    epochs = 10
     history = model.fit(train, ground_truth, epochs=epochs, batch_size=40, validation_split=0.2, shuffle=True)
 
     notify_macos(title='Deep Learning is done.',
@@ -173,15 +152,10 @@ if __name__ == "__main__":
     # show results
     plot_trainingcurves(history)
     # apply the model on the data
-    predictions = model.predict(train[1, :], batch_size=1)
-    truth = ground_truth[1, :]
-
-    # print("predictions shape = ", predictions.shape)
-
-    # print("predictions shape = ", predictions.shape)
-
+    predictions = model.predict(train[0:1, :], batch_size=1)
+    truth = ground_truth[0:1, :]
 
     predictions = predictions.reshape(len(predictions),64,64,3)
     truth = truth.reshape(len(truth),64,64,3)
 
-    vis(predictions[0,:], truth[0,:])
+    plotter(predictions, truth)
