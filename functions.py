@@ -205,24 +205,41 @@ def preprocess_data(inputs, targets, norm=1):
     input_min = {}
     target_min = {}
 
-    for ch in range(0, 3):
-        input_max[ch] = inputs[:, ch, :, :].max()
-        input_min[ch] = inputs[:, ch, :, :].min()
+    if norm > 1:
+        for ch in range(0, 3):
+            input_max[ch] = inputs[:, ch, :, :].max()
+            input_min[ch] = inputs[:, ch, :, :].min()
 
-        target_max[ch] = targets[:, ch, :, :].max()
-        target_min[ch] = targets[:, ch, :, :].min()
+            target_max[ch] = targets[:, ch, :, :].max()
+            target_min[ch] = targets[:, ch, :, :].min()
 
-        # normalization 1
-        if norm == 1:  # to [-1,+1]
-            normalized_inputs[:, ch, :, :] = 2 * (inputs[:, ch, :, :] - input_min[ch]) / (
-                    input_max[ch] - input_min[ch]) - 1
-            normalized_targets[:, ch, :, :] = 2 * (targets[:, ch, :, :] - target_min[ch]) / (
-                    target_max[ch] - target_min[ch]) - 1
+            # normalization 1
+            if norm == 3:  # to [-1,+1]
+                normalized_inputs[:, ch, :, :] = 2 * (inputs[:, ch, :, :] - input_min[ch]) / (
+                        input_max[ch] - input_min[ch]) - 1
+                normalized_targets[:, ch, :, :] = 2 * (targets[:, ch, :, :] - target_min[ch]) / (
+                        target_max[ch] - target_min[ch]) - 1
 
-        # normalization 2
-        if norm == 2:  # just divide with maximum
-            normalized_inputs[:, ch, :, :] = inputs[:, ch, :, :] / input_max[ch]
-            normalized_targets[:, ch, :, :] = targets[:, ch, :, :] / target_max[ch]
+            # normalization 2
+            elif norm == 2:  # just divide with maximum
+                normalized_inputs[:, ch, :, :] = inputs[:, ch, :, :] / input_max[ch]
+                normalized_targets[:, ch, :, :] = targets[:, ch, :, :] / target_max[ch]
+
+    elif norm == 1: #Nils normalization
+        vxmax = np.empty(len(inputs))
+        vymax = np.empty(len(inputs))
+        for s in range(0,len(inputs)):
+            #step 1
+            vxmax[s] = inputs[s, 0, :, :].max()
+            vymax[s] = inputs[s, 1, :, :].max()
+            magnitude = np.sqrt(vxmax[s] ** 2 + vymax[s] ** 2)
+            #step 2
+            normalized_targets[s,1,:,:] = targets[s,1,:,:]/ magnitude
+            normalized_targets[s, 2, :, :] = targets[s, 2, :, :] / magnitude
+            #step3
+            normalized_targets[s,0,:,:] = targets[s, 0, :, :] / magnitude**2
+            #inputs stay the same
+            normalized_inputs = inputs
     return normalized_inputs, normalized_targets
 
 
