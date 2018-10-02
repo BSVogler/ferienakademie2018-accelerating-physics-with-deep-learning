@@ -287,8 +287,15 @@ def plot_conv_weights(model, layer):
 
 
 def plot_var_kernel(model, layerindex, channel=0):
+    """
+    Plot the variance in the kernels.
+    :param model:
+    :param layerindex:
+    :param channel:
+    :return:
+    """
     weights = model.get_layer(index=layerindex).get_weights()[0]
-    var = np.var(weights, axis=(3))
+    var = np.var(weights, axis=(3)) # variance over every kernel
     plt.imshow(var[:, :, channel])
     plt.colorbar()
     plt.show()
