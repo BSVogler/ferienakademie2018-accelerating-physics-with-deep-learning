@@ -271,7 +271,7 @@ def plot_conv_weights(model, layer):
     print('Kernel shape:', weights.shape)
     # has four dimensions?
     if len(weights.shape) == 4:
-        weights = np.squeeze(weights)
+        weights = np.squeeze(weights) #usually the weights do not contain 1d entries, so why is this needed?
         width = weights.shape[0]
         height = weights.shape[1]
         channels = weights.shape[2]
@@ -281,10 +281,24 @@ def plot_conv_weights(model, layer):
         axs = axs.ravel()
         for i in range(channels * filters):
             axs[i].imshow(weights[:, :, i % channels, i // channels])
-            axs[i].set_title('Filter' + str(i // channels) + '\nFeature' + str(i % channels))
+            #axs[i].set_title('Filter' + str(i // channels) + '\nFeature' + str(i % channels))
         print('Number of trainable weights in layer:', width * height * channels * filters)
         fig.show()
 
+
+def plot_var_kernel(model, layerindex, channel=0):
+    """
+    Plot the variance in the kernels.
+    :param model:
+    :param layerindex:
+    :param channel:
+    :return:
+    """
+    weights = model.get_layer(index=layerindex).get_weights()[0]
+    var = np.var(weights, axis=(3)) # variance over every kernel
+    plt.imshow(var[:, :, channel])
+    plt.colorbar()
+    plt.show()
 
 def sizeof_fmt(num, suffix='B'):
     """
