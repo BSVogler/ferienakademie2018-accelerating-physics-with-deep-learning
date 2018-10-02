@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
     # data preprocessing
     # normalize values
-    normalized_inputs, normalized_targets = preprocess_data(inputs, targets, norm=2)
+    normalized_inputs, normalized_targets = normalize_data(inputs, targets, norm=2)
 
     print('Normalized input maxes:', normalized_inputs[:, 0, :, :].max(), normalized_inputs[:, 1, :, :].max(),
           normalized_inputs[:, 2, :, :].max())

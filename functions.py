@@ -165,10 +165,10 @@ def error_distribution(truth, predictions, nbins=20):
         np.max(errors))[0:5])
     plt.show()
 
-#shuffle and split dataset in given fraction
+
 def randsplit(inputs, targets, frac=.9):
     """
-    splits a dataset into two bins
+    shuffle and split dataset in given fraction
     :param inputs: dataset
     :param targets: dataset
     :param frac: fraction where the split is applied
@@ -189,7 +189,7 @@ def randsplit(inputs, targets, frac=.9):
 
 
 # normalize data
-def preprocess_data(inputs, targets, norm=1):
+def normalize_data(inputs, targets, norm=1):
     """
     Normalizes the data.
     :param inputs: dimension 0: item index, 1: channel, 2: image dim x, 3: image dimy

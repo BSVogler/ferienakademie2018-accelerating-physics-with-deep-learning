@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from os import listdir
 
 from visualization import vis
-from functions import preprocess_data
+from functions import normalize_data
 from functions import plot_trainingcurves
 
 __all__ = ['model','inputs','targets']
@@ -31,7 +31,7 @@ for i, file in enumerate(files):
     if abs(targets[i,0,:,:]).max() < p_abs_max:
     	p_abs_max = abs(targets[i,0,:,:]).max()
 
-_inputs,_targets = preprocess_data(inputs,targets)
+_inputs,_targets = normalize_data(inputs, targets)
 inputs = inputs.transpose(0,2,3,1)
 targets = targets.transpose(0,2,3,1)
 _targets = _targets.transpose(0,2,3,1)
