@@ -104,32 +104,28 @@ def plotter(predictionset, ground_truth, index=-1):
 
     # relative error
     plt.figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
-
-    eps = 1e-5
+    eps = 1e-8
     plt.subplot(331)
     plt.title('Rel. error pressure', fontsize=10)
-    relerr = np.abs(ground_truth[sampleindex, :, :, 0]-predictionset[sampleindex, :, :, 0]) /\
-             np.abs(ground_truth[sampleindex,:, :, 0] + eps)
-    relerrmask = np.ma.masked_where(relerr > 1e6, relerr)
-    plt.imshow(relerrmask,cmap='jet')
+    relerrp = np.abs(ground_truth[sampleindex, :, :, 0]-predictionset[sampleindex, :, :, 0]) /np.abs(ground_truth[sampleindex,:, :, 0] + eps)
+    relerrmaskp = np.ma.masked_where(relerrp > 1e5, relerrp)
+    plt.imshow(relerrmaskp,cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(332)
     plt.title('Rel. error x velocity', fontsize=10)
-    relerr = np.abs(ground_truth[sampleindex, :, :, 1]-predictionset[sampleindex, :, :, 1]) /\
-             np.abs(ground_truth[sampleindex,:, :, 1] + eps)
-    relerrmask = np.ma.masked_where(relerr > 1e6, relerr)
-    plt.imshow(relerrmask,cmap='jet')
+    relerrvx = np.abs(ground_truth[sampleindex, :, :, 1]-predictionset[sampleindex, :, :, 1]) /np.abs(ground_truth[sampleindex,:, :,1] + eps)
+    relerrmaskvx = np.ma.masked_where(relerrvx > 1e5, relerrvx)
+    plt.imshow(relerrmaskvx,cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(333)
     plt.title('Rel. error y velocity', fontsize=10)
-    relerr = np.abs(ground_truth[sampleindex, :, :, 2] - predictionset[sampleindex, :, :, 2]) /\
-             np.abs(ground_truth[sampleindex,:, :, 2] + eps)
-    relerrmask = np.ma.masked_where(relerr > 1e6, relerr)
-    plt.imshow(relerrmask,cmap='jet')
+    relerrvy = np.abs(ground_truth[sampleindex, :, :, 2] - predictionset[sampleindex, :, :, 2]) /np.abs(ground_truth[sampleindex,:, :, 2] + eps)
+    relerrmaskvy = np.ma.masked_where(relerrvy > 1e5, relerrvy)
+    plt.imshow(relerrmaskvy,cmap='jet')
     plt.colorbar()
     plt.axis('off')
 
