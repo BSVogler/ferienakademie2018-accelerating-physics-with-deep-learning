@@ -30,19 +30,25 @@ def plotter(x, y, index=-1):
     # predicted data
     plt.subplot(331)
     plt.title('Predicted pressure', fontsize=10)
-    plt.imshow(x[random_sample, :, :, 0], cmap='jet')  # vmin=-100,vmax=100, cmap='jet')
+    plt.imshow(x[random_sample, :, :, 0], cmap='jet',
+               vmin=y[random_sample,:,:,0].min(),
+               vmax=y[random_sample,:,:,0].max())
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(332)
     plt.title('Predicted x velocity', fontsize=10)
-    plt.imshow(x[random_sample, :, :, 1], cmap='jet')
+    plt.imshow(x[random_sample, :, :, 1], cmap='jet',
+               vmin=y[random_sample,:,:,1].min(),
+               vmax=y[random_sample,:,:,1].max())
     plt.colorbar()
     plt.axis('off')
 
     plt.subplot(333)
     plt.title('Predicted y velocity', fontsize=10)
-    plt.imshow(x[random_sample, :, :, 2], cmap='jet')
+    plt.imshow(x[random_sample, :, :, 2], cmap='jet',
+               vmin=y[random_sample,:,:,2].min(),
+               vmax=y[random_sample,:,:,2].max())
     plt.colorbar()
     plt.axis('off')
 
