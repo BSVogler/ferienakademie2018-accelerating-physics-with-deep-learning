@@ -48,17 +48,28 @@ ConvDown4  = keras.layers.Conv2D(filters=512,kernel_size=(4,4),strides=(2,2),pad
 ConvDown5  = keras.layers.Conv2D(filters=512,kernel_size=(3,3),strides=(2,2),padding="same",activation='elu')(ConvDown4)
 ConvDown6  = keras.layers.Conv2D(filters=512,kernel_size=(2,2),strides=(2,2),padding="same",activation='elu')(ConvDown5)
 
-ConvUp1 = keras.layers.Conv2DTranspose(filters=512,kernel_size=(2,2),strides=(2,2),padding="same",activation='elu')(ConvDown6)
+SampUp1 = keras.layers.UpSampling2D(size=(2, 2), data_format=None)(ConvDown6)
+ConvUp1 = keras.layers.Conv2D(filters=512,kernel_size=(2,2),strides=(1,1),padding="same",activation='elu')(SampUp1)
 merge1  = keras.layers.concatenate([ConvDown5,ConvUp1],axis=-1)
-ConvUp2 = keras.layers.Conv2DTranspose(filters=512,kernel_size=(3,3),strides=(2,2),padding="same",activation='elu')(merge1)
+
+SampUp2 = keras.layers.UpSampling2D(size=(2, 2), data_format=None)(merge1)
+ConvUp2 = keras.layers.Conv2D(filters=512,kernel_size=(3,3),strides=(1,1),padding="same",activation='elu')(SampUp2)
 merge2  = keras.layers.concatenate([ConvDown4,ConvUp2],axis=-1)
-ConvUp3 = keras.layers.Conv2DTranspose(filters=256,kernel_size=(4,4),strides=(2,2),padding="same",activation='elu')(merge2)
+
+SampUp3 = keras.layers.UpSampling2D(size=(2, 2), data_format=None)(merge2)
+ConvUp3 = keras.layers.Conv2D(filters=256,kernel_size=(4,4),strides=(1,1),padding="same",activation='elu')(SampUp3)
 merge3  = keras.layers.concatenate([ConvDown3,ConvUp3],axis=-1)
-ConvUp4 = keras.layers.Conv2DTranspose(filters=128,kernel_size=(4,4),strides=(2,2),padding="same",activation='elu')(merge3)
+
+SampUp4 = keras.layers.UpSampling2D(size=(2, 2), data_format=None)(merge3)
+ConvUp4 = keras.layers.Conv2D(filters=128,kernel_size=(4,4),strides=(1,1),padding="same",activation='elu')(SampUp4)
 merge4  = keras.layers.concatenate([ConvDown2,ConvUp4],axis=-1)
-ConvUp5 = keras.layers.Conv2DTranspose(filters=64,kernel_size=(4,4),strides=(2,2),padding="same",activation='elu')(merge4)
+
+SampUp5 = keras.layers.UpSampling2D(size=(2, 2), data_format=None)(merge4)
+ConvUp5 = keras.layers.Conv2D(filters=64,kernel_size=(4,4),strides=(1,1),padding="same",activation='elu')(SampUp5)
 merge5  = keras.layers.concatenate([ConvDown1,ConvUp5],axis=-1)
-ConvUp6 = keras.layers.Conv2DTranspose(filters=3,kernel_size=(4,4),strides=(2,2),padding="same",activation='elu')(merge5)
+
+SampUp6 = keras.layers.UpSampling2D(size=(2, 2), data_format=None)(merge5)
+ConvUp6 = keras.layers.Conv2D(filters=3,kernel_size=(4,4),strides=(1,1),padding="same",activation='elu')(SampUp6)
 
 model = keras.models.Model(inputs=init, outputs=ConvUp6)
 
@@ -100,7 +111,7 @@ data_targets = _targets#[0:700]
 #val_target = _targets[700:750]
 
 
-history = model.fit(data_inputs,data_targets,epochs=60,batch_size=25,validation_split=0.8,shuffle=True)
+history = model.fit(data_inputs,data_targets,epochs=40,batch_size=30,validation_split=0.2,shuffle=True)
 
 # Visualization
 #apply the model on the data
