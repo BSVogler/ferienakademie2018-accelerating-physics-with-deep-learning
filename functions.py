@@ -355,17 +355,11 @@ def print_memory_usage(model):
     :param model:
     :return:
     """
-    sumWeights = 0
-    for l in model.layers:
-        weights = l.get_weights()
-        num_in_layer = 0
-        for w in weights:
-            num_in_layer += w.size
-        sumWeights += num_in_layer
+    weights = model.count_params()
 
-    memory = sumWeights * 4  # we are using four bytes for each weight
+    memory = weights * 4  # we are using four bytes for each weight
 
-    print(str(sumWeights) + " weights use " + str(sizeof_fmt(memory)))
+    print(str(weights) + " weights use " + str(sizeof_fmt(memory)))
 
 
 def arg_getter(truth, predictions):
