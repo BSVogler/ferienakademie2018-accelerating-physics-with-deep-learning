@@ -9,6 +9,7 @@ from tensorflow import keras
 import matplotlib.pyplot as plt
 from os import listdir
 import sys
+from decimal import Decimal
 from functions import *
 import random
 
@@ -290,13 +291,18 @@ def plot_var_kernel(model, layerindex, channel=0):
     :param channel:
     :return:
     """
-    fig = plt.figure()
-    fig.suptitle('layer: '+str(layerindex)+"chanel: "+str(channel), fontsize=14, fontweight='bold')
-    weights = model.get_layer(index=layerindex).get_weights()[0]
-    var = np.var(weights, axis=(3)) # variance over every kernel
-    fig.imshow(var[:, :, channel])
-    fig.colorbar()
-    fig.show()
+    if len(model.get_layer(index=layerindex).get_weights())!=0:
+        fig = plt.figure()
+        fig.suptitle('layer: '+str(layerindex)+" chanel: "+str(channel), fontsize=14, fontweight='bold')
+        weights = model.get_layer(index=layerindex).get_weights()[0]
+        var = np.var(weights, axis=(3))[:, :, channel] # variance over every kernel
+        plt.imshow(var)
+        avgvar = np.average(var)
+        plt.text(1,1,str('%.2E' % avgvar))
+        plt.colorbar()
+        fig.show()
+    else:
+        print("layer has no weights")
 
 def sizeof_fmt(num, suffix='B'):
     """
