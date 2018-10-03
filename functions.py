@@ -283,26 +283,38 @@ def plot_conv_weights(model, layer):
         fig.show()
 
 
-def plot_var_kernel(model, layerindex, channel=0):
+def plot_var_kernel(model, layerindex=-1, channel=0):
     """
-    Plot the variance in the kernels.
+    Plot the variance of the kernels.
     :param model:
-    :param layerindex:
-    :param channel:
+    :param layerindex: if -1 will combine every layer
+    :param channel: 0,1, or 2
     :return:
     """
-    if len(model.get_layer(index=layerindex).get_weights())!=0:
-        fig = plt.figure()
-        fig.suptitle('layer: '+str(layerindex)+" chanel: "+str(channel), fontsize=14, fontweight='bold')
-        weights = model.get_layer(index=layerindex).get_weights()[0]
-        var = np.var(weights, axis=(3))[:, :, channel] # variance over every kernel
-        plt.imshow(var)
+    fig = plt.figure()
+    if layerindex == -1:
+        varkernel = np.ndarray((len(model.layers), 4, 4))
+        for i in range(len(model.layers)):
+            weights = model.get_layer(index=layerindex).get_weights()[0]
+            varkernel[i] = np.var(weights, axis=(3))[:, :, channel]  # variance over every kernel
+        var = np.average(varkernel,axis=0) # variance of every layer combined
         avgvar = np.average(var)
-        plt.text(1,1,str('%.2E' % avgvar))
-        plt.colorbar()
-        fig.show()
+        fig.suptitle("variance in kernel of ever layer combined, chanel: " + str(channel), fontsize=14, fontweight='bold')
+
     else:
-        print("layer has no weights")
+        if len(model.get_layer(index=layerindex).get_weights())!=0:
+            weights = model.get_layer(index=layerindex).get_weights()[0]
+            var = np.var(weights, axis=(3))[:, :, channel] # variance over every kernel
+            avgvar = np.average(var)
+            fig.suptitle("variance in kernel of layer: "+str(layerindex)+" chanel: "+str(channel), fontsize=14, fontweight='bold')
+        else:
+            print("layer has no weights")
+            return
+
+    plt.imshow(var)
+    plt.text(1,1,str('%.2E' % avgvar))
+    plt.colorbar()
+    fig.show()
 
 def sizeof_fmt(num, suffix='B'):
     """
