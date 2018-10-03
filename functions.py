@@ -290,11 +290,13 @@ def plot_var_kernel(model, layerindex, channel=0):
     :param channel:
     :return:
     """
+    fig = plt.figure()
+    fig.suptitle('layer: '+str(layerindex)+"chanel: "+str(channel), fontsize=14, fontweight='bold')
     weights = model.get_layer(index=layerindex).get_weights()[0]
     var = np.var(weights, axis=(3)) # variance over every kernel
-    plt.imshow(var[:, :, channel])
-    plt.colorbar()
-    plt.show()
+    fig.imshow(var[:, :, channel])
+    fig.colorbar()
+    fig.show()
 
 def sizeof_fmt(num, suffix='B'):
     """
