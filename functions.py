@@ -387,7 +387,7 @@ def plot_trainingcurves(history):
     plt.title('model loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
-    plt.legend(['train', 'validation'], loc='upper left')
+    plt.legend(['training', 'validation'], loc='upper left')
     plt.show()
 
 
