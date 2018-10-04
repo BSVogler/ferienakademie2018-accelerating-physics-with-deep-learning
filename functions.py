@@ -458,14 +458,14 @@ def arg_getter(truth, predictions):
     return sorted_args
 
 #calculates the mean sample from the samples
-def get_mean_img(reference,output):
+def get_mean_img(ground_truth, output):
     '''
 
-    :param reference: ground truth samples
+    :param ground_truth: ground truth samples
     :param output: model predictions
     :return: mean image of the samples, both pred. and truth and relative error for each channel, using the relative_error method
     '''
-    mean_ref = reference.sum(axis=0) / len(reference)
+    mean_ref = ground_truth.sum(axis=0) / len(ground_truth)
     mean_output = output.sum(axis=0) / len(output)
     rel_err = []
     [rel_err.append(relative_error(mean_ref[:, :, ch], mean_output[:, :, ch])) for ch in range(0, 3)]
