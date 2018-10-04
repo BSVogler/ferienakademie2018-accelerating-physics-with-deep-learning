@@ -294,12 +294,13 @@ def plot_var_kernel(model, layerindex=-1, channel=0):
 
     if layerindex == -1:
         varkernel = np.zeros((len(model.layers),4,4))
+        # for every layer
         for i in range(len(model.layers)):
             if len(model.get_layer(index=i).get_weights()) != 0:
                 weights = model.get_layer(index=i).get_weights()[0]
-                # variance over every kernel
+                # variance across every kernel
                 kernelvar = np.var(weights, axis=(3))[:, :, channel]
-                #zeropadding
+                # zeropadding
                 varkernel[i,:kernelvar.shape[0],: kernelvar.shape[1]] = kernelvar
         var = np.average(varkernel,axis=0) # variance of every layer combined
         #bar chart
