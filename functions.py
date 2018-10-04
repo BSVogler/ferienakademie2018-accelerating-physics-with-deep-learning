@@ -1,3 +1,4 @@
+
 import os
 
 # forces CPU usage
@@ -109,7 +110,7 @@ def plotter(predictionset, ground_truth, index=-1):
     plt.subplot(331)
     plt.title('Rel. error pressure', fontsize=10)
     relerrp = np.abs(ground_truth[sampleindex, :, :, 0]-predictionset[sampleindex, :, :, 0]) /np.abs(ground_truth[sampleindex,:, :, 0] + eps)
-    relerrmaskp = np.ma.masked_where(relerrp > 1e4, relerrp)
+    relerrmaskp = np.ma.masked_where(relerrp > 1e3, relerrp)
     plt.imshow(relerrmaskp,cmap='jet')
     plt.colorbar()
     plt.axis('off')
@@ -117,7 +118,7 @@ def plotter(predictionset, ground_truth, index=-1):
     plt.subplot(332)
     plt.title('Rel. error x velocity', fontsize=10)
     relerrvx = np.abs(ground_truth[sampleindex, :, :, 1]-predictionset[sampleindex, :, :, 1]) /np.abs(ground_truth[sampleindex,:, :,1] + eps)
-    relerrmaskvx = np.ma.masked_where(relerrvx > 1e4, relerrvx)
+    relerrmaskvx = np.ma.masked_where(relerrvx > 1e3, relerrvx)
     plt.imshow(relerrmaskvx,cmap='jet')
     plt.colorbar()
     plt.axis('off')
@@ -125,7 +126,7 @@ def plotter(predictionset, ground_truth, index=-1):
     plt.subplot(333)
     plt.title('Rel. error y velocity', fontsize=10)
     relerrvy = np.abs(ground_truth[sampleindex, :, :, 2] - predictionset[sampleindex, :, :, 2]) /np.abs(ground_truth[sampleindex,:, :, 2] + eps)
-    relerrmaskvy = np.ma.masked_where(relerrvy > 1e4, relerrvy)
+    relerrmaskvy = np.ma.masked_where(relerrvy > 1e3, relerrvy)
     plt.imshow(relerrmaskvy,cmap='jet')
     plt.colorbar()
     plt.axis('off')
@@ -135,22 +136,20 @@ def plotter(predictionset, ground_truth, index=-1):
 
 def relative_error_tensor(truth, predictions):
     """
-
     :param truth: normalized ground truth, targets as [64,64,3]
     :param predictions: normalized output of network, predictions as [64,64,3]
     :return: relative error(scalar)
     """
-    results = tf.divide(keras.backend.sum(keras.backend.abs(keras.layers.subtract([predictions , truth]))),keras.backend.sum(keras.backend.abs(truth)))
+    results = tf.divide(keras.backend.sum(keras.backend.abs(tf.subtract(predictions , truth))),keras.backend.sum(keras.backend.abs(truth)))
     print(results)
     print(truth)
     #if results == np.Inf:
     #    print("infinity reached")
-    #return results
+    return results
 
 
 def relative_error_multiple(truth, predictions):
     """
-
     :param truth: normalized ground truth, targets as [n_samples,64,64,3]
     :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
     :return: relative error(array)
@@ -162,7 +161,6 @@ def relative_error_multiple(truth, predictions):
 
 def relative_error(truth, predictions):
     """
-
     :param truth: normalized ground truth, targets as [n_samples,64,64,3]
     :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
     :return: relative error(array)
@@ -258,7 +256,7 @@ def normalize_data(inputs, targets, norm=1):
             normalized_targets[s, 1, :, :] = targets[s, 1, :, :] / magnitude
             normalized_targets[s, 2, :, :] = targets[s, 2, :, :] / magnitude
             # step3
-            normalized_targets[s, 0, :, :] = targets[s, 0, :, :] / magnitude ** 2
+            normalized_targets[s, 0, :, :] = targets[s, 0, :, :] / magnitude ** 2 - normalized_targets[s, 0, :, :].mean()
             # inputs stay the same
             normalized_inputs = inputs
     return normalized_inputs, normalized_targets, vxmax, vymax
@@ -300,7 +298,6 @@ def plot_conv_weights(model, layer):
     :param model: nn model
     :param layer: index of layer as an integer
     :return: plot of convolution layer weights and shape of kernels and no. of weights
-
     """
     if len(model.get_layer(index=layer).get_weights()) == 0:
         print("layer has no weights")
@@ -418,7 +415,6 @@ def plot_trainingcurves(history):
 
 def notify_macos(title, subtitle, message):
     """
-
     :param title:
     :param subtitle:
     :param message:
@@ -460,7 +456,6 @@ def arg_getter(truth, predictions):
 #calculates the mean sample from the samples
 def get_mean_img(ground_truth, output):
     '''
-
     :param ground_truth: ground truth samples
     :param output: model predictions
     :return: mean image of the samples, both pred. and truth and relative error for each channel, using the relative_error method
