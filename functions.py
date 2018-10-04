@@ -167,7 +167,8 @@ def relative_error(truth, predictions):
     :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
     :return: relative error(array)
     """
-    results = np.sum(np.abs(predictions[ :, :, :] - truth[ :, :, :])) / np.sum(np.abs(truth[ :, :, :]))
+    results = np.sum(np.abs(predictions - truth)) / np.sum(np.abs(truth))
+    return results
 
 def error_distribution(truth, predictions, nbins=20):
     """
