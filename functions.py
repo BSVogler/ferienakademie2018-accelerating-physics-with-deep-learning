@@ -160,6 +160,14 @@ def relative_error_multiple(truth, predictions):
         results[i] = np.sum(np.abs(predictions[i, :, :, :] - truth[i, :, :, :])) / np.sum(np.abs(truth[i, :, :, :]))
     return results
 
+def relative_error(truth, predictions):
+    """
+
+    :param truth: normalized ground truth, targets as [n_samples,64,64,3]
+    :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
+    :return: relative error(array)
+    """
+    results = np.sum(np.abs(predictions[ :, :, :] - truth[ :, :, :])) / np.sum(np.abs(truth[ :, :, :]))
 
 def error_distribution(truth, predictions, nbins=20):
     """
