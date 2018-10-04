@@ -41,6 +41,7 @@ _inputs  = _inputs.transpose(0,2,3,1)
 
 
 init = keras.layers.Input(shape=(64,64,3))
+
 ConvDown1  = keras.layers.Conv2D(filters=32,kernel_size=(4,4),strides=(2,2),padding="same",activation='relu')(init)
 ConvDown2  = keras.layers.Conv2D(filters=64,kernel_size=(4,4),strides=(2,2),padding="same",activation='relu')(ConvDown1)
 ConvDown3  = keras.layers.Conv2D(filters=128,kernel_size=(4,4),strides=(2,2),padding="same",activation='relu')(ConvDown2)
@@ -81,7 +82,7 @@ model.add(keras.layers.Conv2DTranspose(filters=64,kernel_size=(4,4),strides=(2,2
 model.add(keras.layers.Conv2DTranspose(filters=3,kernel_size=(4,4),strides=(2,2),padding="same",activation='relu'))
 '''
 
-model.compile(optimizer=tf.train.AdamOptimizer(0.0003),loss='mean_absolute_error', metrics=['accuracy']) # Compile
+model.compile(optimizer=tf.train.AdamOptimizer(0.0001),loss='mean_absolute_error', metrics=['accuracy']) # Compile
 
 
 
@@ -96,7 +97,7 @@ data_targets = _targets#[0:700]
 #val_target = _targets[700:750]
 
 
-history = model.fit(data_inputs,data_targets,epochs=60,batch_size=50,validation_split=0.2,shuffle=True)
+history = model.fit(data_inputs,data_targets,epochs=50,batch_size=20,validation_split=0.2,shuffle=True)
 
 # Visualization
 #apply the model on the data
