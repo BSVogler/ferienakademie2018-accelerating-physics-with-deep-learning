@@ -465,8 +465,10 @@ def get_mean_img(reference,output):
     :param output: model predictions
     :return: mean image of the samples, both pred. and truth and relative error for each channel, using the relative_error method
     '''
-    mean_ref = reference.sum(axis = 0)/len(reference)
-    mean_output = output.sum(axis = 0)/len(output)
+    mean_ref = reference.sum(axis=0) / len(reference)
+    mean_output = output.sum(axis=0) / len(output)
     rel_err = []
-    [rel_err.append(relative_error(mean_ref[:,:,ch], mean_output[:,:,ch])) for ch in range(0,3)]
-    return mean_ref, mean_output, rel_err
+    [rel_err.append(relative_error(mean_ref[:, :, ch], mean_output[:, :, ch])) for ch in range(0, 3)]
+    ref_mean_truth = np.sum(np.abs(mean_ref))
+    ref_mean_pred = np.sum(np.abs(mean_output))
+    return mean_ref, mean_output, rel_err, ref_mean_truth, ref_mean_pred
