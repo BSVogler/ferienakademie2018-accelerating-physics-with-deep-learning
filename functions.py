@@ -133,17 +133,19 @@ def plotter(predictionset, ground_truth, index=-1):
     plt.show()
 
 
-def relative_error(truth, predictions):
+def relative_error_tensor(truth, predictions):
     """
 
     :param truth: normalized ground truth, targets as [64,64,3]
     :param predictions: normalized output of network, predictions as [64,64,3]
     :return: relative error(scalar)
     """
-    results = np.sum(np.abs(predictions - truth)) / np.sum(np.abs(truth))
-    if results == np.Inf:
-        print("infinity reached")
-    return results
+    results = tf.divide(keras.backend.sum(keras.backend.abs(keras.layers.subtract([predictions , truth]))),keras.backend.sum(keras.backend.abs(truth)))
+    print(results)
+    print(truth)
+    #if results == np.Inf:
+    #    print("infinity reached")
+    #return results
 
 
 def relative_error_multiple(truth, predictions):
@@ -158,6 +160,14 @@ def relative_error_multiple(truth, predictions):
         results[i] = np.sum(np.abs(predictions[i, :, :, :] - truth[i, :, :, :])) / np.sum(np.abs(truth[i, :, :, :]))
     return results
 
+def relative_error(truth, predictions):
+    """
+
+    :param truth: normalized ground truth, targets as [n_samples,64,64,3]
+    :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
+    :return: relative error(array)
+    """
+    results = np.sum(np.abs(predictions[ :, :, :] - truth[ :, :, :])) / np.sum(np.abs(truth[ :, :, :]))
 
 def error_distribution(truth, predictions, nbins=20):
     """
@@ -320,24 +330,35 @@ def plot_var_kernel(model, layerindex=-1, channel=0):
     """
 
     if layerindex == -1:
-        varkernel = np.zeros((len(model.layers),4,4))
+        var_kernel = np.zeros((len(model.layers), 4, 4))
+        mean_kernel = np.zeros((len(model.layers), 4, 4))
         # for every layer
         for i in range(len(model.layers)):
             if len(model.get_layer(index=i).get_weights()) != 0:
                 weights = model.get_layer(index=i).get_weights()[0]
                 # variance across every kernel
                 kernelvar = np.var(weights, axis=(3))[:, :, channel]
+                kernelmean = np.mean(weights, axis=3)[:, :, channel]
                 # zeropadding
-                varkernel[i,:kernelvar.shape[0],: kernelvar.shape[1]] = kernelvar
+                var_kernel[i, :kernelvar.shape[0], : kernelvar.shape[1]] = kernelvar
+                mean_kernel[i, :kernelmean.shape[0], : kernelmean.shape[1]] = kernelmean
 
         # bar chart
-        plt.figure()
-        plt.bar(range(len(model.layers)),np.average(varkernel,axis=(1,2)))
+        fig = plt.figure()
+        fig.suptitle("mean per layer, chanel: " + str(channel), fontsize=14,
+                     fontweight='bold')
+        plt.bar(range(len(model.layers)),np.average(mean_kernel,axis=(1,2)))
+        plt.show()
+
+        fig = plt.figure()
+        fig.suptitle("variance per layer, chanel: " + str(channel), fontsize=14,
+                     fontweight='bold')
+        plt.bar(range(len(model.layers)), np.average(var_kernel, axis=(1, 2)))
         plt.show()
 
         fig = plt.figure()
         fig.suptitle("variance in kernel of ever layer combined, chanel: " + str(channel), fontsize=14, fontweight='bold')
-        var = np.average(varkernel,axis=0) # variance of every layer combined
+        var = np.average(var_kernel, axis=0) # variance of every layer combined
         # unit normalize
         std = np.std(var)
         if std != 0:
