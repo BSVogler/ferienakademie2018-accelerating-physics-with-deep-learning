@@ -260,7 +260,7 @@ def denormalize_data(normalized_inputs, normalized_targets, vxmax,vymax):
     :param normalized_targets: dimension 0: item index, 1: channel, 2: image dim x, 3: image dimy
     :param vxmax: maximum vx values of each input sample
     :param vymax: maximum vy values of each input sample
-    :return: denormalized data
+    :return: denormalized data (input, target)
     """
     denormalized_inputs = np.empty_like(normalized_inputs)
     denormalized_targets = np.empty_like(normalized_targets)
