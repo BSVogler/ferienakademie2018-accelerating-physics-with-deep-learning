@@ -320,24 +320,35 @@ def plot_var_kernel(model, layerindex=-1, channel=0):
     """
 
     if layerindex == -1:
-        varkernel = np.zeros((len(model.layers),4,4))
+        var_kernel = np.zeros((len(model.layers), 4, 4))
+        mean_kernel = np.zeros((len(model.layers), 4, 4))
         # for every layer
         for i in range(len(model.layers)):
             if len(model.get_layer(index=i).get_weights()) != 0:
                 weights = model.get_layer(index=i).get_weights()[0]
                 # variance across every kernel
                 kernelvar = np.var(weights, axis=(3))[:, :, channel]
+                kernelmean = np.mean(weights, axis=3)[:, :, channel]
                 # zeropadding
-                varkernel[i,:kernelvar.shape[0],: kernelvar.shape[1]] = kernelvar
+                var_kernel[i, :kernelvar.shape[0], : kernelvar.shape[1]] = kernelvar
+                mean_kernel[i, :kernelmean.shape[0], : kernelmean.shape[1]] = kernelmean
 
         # bar chart
-        plt.figure()
-        plt.bar(range(len(model.layers)),np.average(varkernel,axis=(1,2)))
+        fig = plt.figure()
+        fig.suptitle("mean per layer, chanel: " + str(channel), fontsize=14,
+                     fontweight='bold')
+        plt.bar(range(len(model.layers)),np.average(mean_kernel,axis=(1,2)))
+        plt.show()
+
+        fig = plt.figure()
+        fig.suptitle("variance per layer, chanel: " + str(channel), fontsize=14,
+                     fontweight='bold')
+        plt.bar(range(len(model.layers)), np.average(var_kernel, axis=(1, 2)))
         plt.show()
 
         fig = plt.figure()
         fig.suptitle("variance in kernel of ever layer combined, chanel: " + str(channel), fontsize=14, fontweight='bold')
-        var = np.average(varkernel,axis=0) # variance of every layer combined
+        var = np.average(var_kernel, axis=0) # variance of every layer combined
         # unit normalize
         std = np.std(var)
         if std != 0:
