@@ -140,7 +140,7 @@ def relative_error_tensor(truth, predictions):
     :param predictions: normalized output of network, predictions as [64,64,3]
     :return: relative error(scalar)
     """
-    results = tf.divide(keras.backend.sum(keras.backend.abs(tf.subtract([predictions , truth]))),keras.backend.sum(keras.backend.abs(truth)))
+    results = tf.divide(keras.backend.sum(keras.backend.abs(tf.subtract(predictions , truth))),keras.backend.sum(keras.backend.abs(truth)))
     print(results)
     print(truth)
     #if results == np.Inf:
