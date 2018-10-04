@@ -265,7 +265,7 @@ def normalize_data(inputs, targets, norm=1):
 
 
 #data denormalization
-def denormalize_data(normalized_inputs, normalized_targets, vxmax,vymax):
+def denormalize_data(normalized_preds, normalized_targets, vxmax,vymax):
     """
     Denormalizes the data.
     :param normalized_inputs: dimension 0: item index, 1: channel, 2: image dim x, 3: image dimy
@@ -274,21 +274,23 @@ def denormalize_data(normalized_inputs, normalized_targets, vxmax,vymax):
     :param vymax: maximum vy values of each input sample
     :return: denormalized data (input, target)
     """
-    denormalized_inputs = np.empty_like(normalized_inputs)
+    denormalized_preds = np.empty_like(normalized_inputs)
     denormalized_targets = np.empty_like(normalized_targets)
 
     for s in range(0, len(denormalized_inputs)):
         #step 1 (get magntude of max vel. for each sample)
         magnitude = np.sqrt(vxmax[s] ** 2 + vymax[s] ** 2)
-        # inputs stay the same
-        denormalized_inputs = normalized_inputs
         #step 3
         denormalized_targets[s, 0, :, :] = normalized_targets[s, 0, :, :] * magnitude ** 2
+        denormalized_preds[s, 0, :, :] = normalized_preds[s, 0, :, :] * magnitude ** 2
         # step 2
         denormalized_targets[s, 1, :, :] = normalized_targets[s, 1, :, :] * magnitude
         denormalized_targets[s, 2, :, :] = normalized_targets[s, 2, :, :] * magnitude
 
-    return denormalized_inputs, denormalized_targets
+        denormalized_preds[s, 1, :, :] = denormalized_preds[s, 1, :, :] * magnitude
+        denormalized_preds[s, 2, :, :] = denormalized_preds[s, 2, :, :] * magnitude
+
+    return denormalized_preds, denormalized_targets
 
 
 # plot conv layer weights
