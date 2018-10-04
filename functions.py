@@ -9,6 +9,7 @@ from tensorflow import keras
 import matplotlib.pyplot as plt
 from os import listdir
 import sys
+from decimal import Decimal
 from functions import *
 import random
 
@@ -309,19 +310,49 @@ def plot_conv_weights(model, layer):
         fig.show()
 
 
-def plot_var_kernel(model, layerindex, channel=0):
+def plot_var_kernel(model, layerindex=-1, channel=0):
     """
-    Plot the variance in the kernels.
+    Plot the variance of the kernels.
     :param model:
-    :param layerindex:
-    :param channel:
+    :param layerindex: if -1 will combine every layer
+    :param channel: 0,1, or 2
     :return:
     """
-    weights = model.get_layer(index=layerindex).get_weights()[0]
-    var = np.var(weights, axis=(3)) # variance over every kernel
-    plt.imshow(var[:, :, channel])
+
+    if layerindex == -1:
+        varkernel = np.zeros((len(model.layers),4,4))
+        for i in range(len(model.layers)):
+            if len(model.get_layer(index=i).get_weights()) != 0:
+                weights = model.get_layer(index=i).get_weights()[0]
+                # variance over every kernel
+                kernelvar = np.var(weights, axis=(3))[:, :, channel]
+                #zeropadding
+                varkernel[i,:kernelvar.shape[0],: kernelvar.shape[1]] = kernelvar
+        var = np.average(varkernel,axis=0) # variance of every layer combined
+        print(var)
+        #bar chart
+        plt.figure()
+        plt.bar(range(len(model.layers)),np.average(varkernel,axis=(1,2)))
+        plt.show()
+
+        fig = plt.figure()
+        fig.suptitle("variance in kernel of ever layer combined, chanel: " + str(channel), fontsize=14, fontweight='bold')
+        var_avg = np.average(var)
+    else:
+        if len(model.get_layer(index=layerindex).get_weights())!=0:
+            fig = plt.figure()
+            weights = model.get_layer(index=layerindex).get_weights()[0]
+            var = np.var(weights, axis=(3))[:, :, channel] # variance over every kernel
+            var_avg = np.average(var)
+            fig.suptitle("variance in kernel of layer: "+str(layerindex)+" chanel: "+str(channel), fontsize=14, fontweight='bold')
+        else:
+            print("layer has no weights")
+            return
+
+    plt.imshow(var)
+    plt.text(1,1,str('%.2E' % var_avg))
     plt.colorbar()
-    plt.show()
+    fig.show()
 
 
 def sizeof_fmt(num, suffix='B'):
@@ -375,17 +406,11 @@ def print_memory_usage(model):
     :param model:
     :return:
     """
-    sumWeights = 0
-    for l in model.layers:
-        weights = l.get_weights()
-        num_in_layer = 0
-        for w in weights:
-            num_in_layer += w.size
-        sumWeights += num_in_layer
+    weights = model.count_params()
 
-    memory = sumWeights * 4  # we are using four bytes for each weight
+    memory = weights * 4  # we are using four bytes for each weight
 
-    print(str(sumWeights) + " weights use " + str(sizeof_fmt(memory)))
+    print(str(weights) + " weights use " + str(sizeof_fmt(memory)))
 
 
 def arg_getter(truth, predictions):
