@@ -469,6 +469,6 @@ def get_mean_img(reference,output):
     mean_output = output.sum(axis=0) / len(output)
     rel_err = []
     [rel_err.append(relative_error(mean_ref[:, :, ch], mean_output[:, :, ch])) for ch in range(0, 3)]
-    ref_mean_truth = np.sum(np.abs(mean_ref))
-    ref_mean_pred = np.sum(np.abs(mean_output))
+    ref_mean_truth = np.mean(np.abs(mean_ref))
+    ref_mean_pred = np.mean(np.abs(mean_output))
     return mean_ref, mean_output, rel_err, ref_mean_truth, ref_mean_pred
