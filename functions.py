@@ -268,16 +268,16 @@ def normalize_data(inputs, targets, norm=1):
 def denormalize_data(normalized_preds, normalized_targets, vxmax,vymax):
     """
     Denormalizes the data.
-    :param normalized_inputs: dimension 0: item index, 1: channel, 2: image dim x, 3: image dimy
+    :param denormalized_preds: dimension 0: item index, 1: channel, 2: image dim x, 3: image dimy
     :param normalized_targets: dimension 0: item index, 1: channel, 2: image dim x, 3: image dimy
     :param vxmax: maximum vx values of each input sample
     :param vymax: maximum vy values of each input sample
     :return: denormalized data (input, target)
     """
-    denormalized_preds = np.empty_like(normalized_inputs)
+    denormalized_preds = np.empty_like(normalized_preds)
     denormalized_targets = np.empty_like(normalized_targets)
 
-    for s in range(0, len(denormalized_inputs)):
+    for s in range(0, len(denormalized_preds)):
         #step 1 (get magntude of max vel. for each sample)
         magnitude = np.sqrt(vxmax[s] ** 2 + vymax[s] ** 2)
         #step 3
