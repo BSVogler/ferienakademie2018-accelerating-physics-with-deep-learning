@@ -291,28 +291,39 @@ def plot_var_kernel(model, layerindex=-1, channel=0):
     :param channel: 0,1, or 2
     :return:
     """
-    fig = plt.figure()
-    if layerindex == -1:
-        varkernel = np.ndarray((len(model.layers), 4, 4))
-        for i in range(len(model.layers)):
-            weights = model.get_layer(index=layerindex).get_weights()[0]
-            varkernel[i] = np.var(weights, axis=(3))[:, :, channel]  # variance over every kernel
-        var = np.average(varkernel,axis=0) # variance of every layer combined
-        avgvar = np.average(var)
-        fig.suptitle("variance in kernel of ever layer combined, chanel: " + str(channel), fontsize=14, fontweight='bold')
 
+    if layerindex == -1:
+        varkernel = np.zeros((len(model.layers),4,4))
+        for i in range(len(model.layers)):
+            if len(model.get_layer(index=i).get_weights()) != 0:
+                weights = model.get_layer(index=i).get_weights()[0]
+                # variance over every kernel
+                kernelvar = np.var(weights, axis=(3))[:, :, channel]
+                #zeropadding
+                varkernel[i,:kernelvar.shape[0],: kernelvar.shape[1]] = kernelvar
+        var = np.average(varkernel,axis=0) # variance of every layer combined
+        print(var)
+        #bar chart
+        plt.figure()
+        plt.bar(range(len(model.layers)),np.average(varkernel,axis=(1,2)))
+        plt.show()
+
+        fig = plt.figure()
+        fig.suptitle("variance in kernel of ever layer combined, chanel: " + str(channel), fontsize=14, fontweight='bold')
+        var_avg = np.average(var)
     else:
         if len(model.get_layer(index=layerindex).get_weights())!=0:
+            fig = plt.figure()
             weights = model.get_layer(index=layerindex).get_weights()[0]
             var = np.var(weights, axis=(3))[:, :, channel] # variance over every kernel
-            avgvar = np.average(var)
+            var_avg = np.average(var)
             fig.suptitle("variance in kernel of layer: "+str(layerindex)+" chanel: "+str(channel), fontsize=14, fontweight='bold')
         else:
             print("layer has no weights")
             return
 
     plt.imshow(var)
-    plt.text(1,1,str('%.2E' % avgvar))
+    plt.text(1,1,str('%.2E' % var_avg))
     plt.colorbar()
     fig.show()
 
