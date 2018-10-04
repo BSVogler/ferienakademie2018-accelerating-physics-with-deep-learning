@@ -133,17 +133,19 @@ def plotter(predictionset, ground_truth, index=-1):
     plt.show()
 
 
-def relative_error(truth, predictions):
+def relative_error_tensor(truth, predictions):
     """
 
     :param truth: normalized ground truth, targets as [64,64,3]
     :param predictions: normalized output of network, predictions as [64,64,3]
     :return: relative error(scalar)
     """
-    results = np.sum(np.abs(predictions - truth)) / np.sum(np.abs(truth))
-    if results == np.Inf:
-        print("infinity reached")
-    return results
+    results = tf.divide(keras.backend.sum(keras.backend.abs(keras.layers.subtract([predictions , truth]))),keras.backend.sum(keras.backend.abs(truth)))
+    print(results)
+    print(truth)
+    #if results == np.Inf:
+    #    print("infinity reached")
+    #return results
 
 
 def relative_error_multiple(truth, predictions):
@@ -158,6 +160,14 @@ def relative_error_multiple(truth, predictions):
         results[i] = np.sum(np.abs(predictions[i, :, :, :] - truth[i, :, :, :])) / np.sum(np.abs(truth[i, :, :, :]))
     return results
 
+def relative_error(truth, predictions):
+    """
+
+    :param truth: normalized ground truth, targets as [n_samples,64,64,3]
+    :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
+    :return: relative error(array)
+    """
+    results = np.sum(np.abs(predictions[ :, :, :] - truth[ :, :, :])) / np.sum(np.abs(truth[ :, :, :]))
 
 def error_distribution(truth, predictions, nbins=20):
     """
@@ -398,7 +408,7 @@ def plot_trainingcurves(history):
     plt.title('model loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
-    plt.legend(['train', 'validation'], loc='upper left')
+    plt.legend(['training', 'validation'], loc='upper left')
     plt.show()
 
 
