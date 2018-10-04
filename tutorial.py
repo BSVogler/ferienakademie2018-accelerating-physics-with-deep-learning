@@ -7,61 +7,6 @@ from os import listdir
 from visualization import vis
 from functions import *
 
-
-def draw_input(input, ground_truth, i=0):
-    """
-
-    :param i:
-    :return:
-    """
-    # show first file
-    plt.figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
-    # output layout:
-    # [0] freestream field X + boundary
-    # [1] freestream field Y + boundary
-    # [2] binary mask for boundary
-    # [3] pressure output
-    # [4] velocity X output
-    # [5] velocity Y output
-
-    # [0] freestream field X + boundary
-    plt.subplot(231)
-    plt.imshow(inputs[i, :, :, 0], cmap='jet')
-    plt.colorbar()
-    plt.title('freestream field X + boundary')
-
-    # [1] freestream field Y + boundary
-    plt.subplot(232)
-    plt.imshow(inputs[i, :, :, 1], cmap='jet')
-    plt.colorbar()
-    plt.title('freestream field Y + boundary')
-
-    # [2] binary mask for boundary
-    plt.subplot(233)
-    plt.imshow(inputs[i, :, :, 2], cmap='jet')
-    plt.colorbar()
-    plt.title('binary mask for boundary')
-
-    # [3] pressure output
-    plt.subplot(234)
-    plt.imshow(ground_truth[i, :, :, 0], cmap='jet')
-    plt.colorbar()
-    plt.title('pressure output')
-
-    # [4] velocity X output
-    plt.subplot(235)
-    plt.imshow(ground_truth[i, :, :, 1], cmap='jet')
-    plt.colorbar()
-    plt.title('velocity X output')
-
-    # [5] velocity Y output
-    plt.subplot(236)
-    plt.imshow(ground_truth[i, :, :, 2], cmap='jet')
-    plt.colorbar()
-    plt.title('velocity Y output')
-
-    plt.show()
-
 if __name__ == "__main__":
     # load dataset
     dataDir = "./data/trainSmallFA/"
