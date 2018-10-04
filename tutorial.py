@@ -119,9 +119,9 @@ if __name__ == "__main__":
 
 
     predictions = predictions.reshape(len(predictions),64,64,3)
-    truth = truth.reshape(len(truth),64,64,3)
+    #truth = truth.reshape(len(truth),64,64,3)
 
-    plotter(predictions, truth,index=0)
+    # plotter(predictions, truth,index=0)
     predictions_denormalized, truth_denormalized = denormalize_data(predictions[:numPredictions],truth,vxmax,vymax)
     plotter(predictions_denormalized, truth_denormalized, index=0)
     relative_error(truth_denormalized, predictions_denormalized)
