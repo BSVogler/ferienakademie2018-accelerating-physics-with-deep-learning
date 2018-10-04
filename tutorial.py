@@ -122,5 +122,6 @@ if __name__ == "__main__":
     truth = truth.reshape(len(truth),64,64,3)
 
     plotter(predictions, truth,index=0)
-    train_denormalized, truth_denormalized = denormalize_data(train[:numPredictions],truth,vxmax,vymax)
-    relative_error(truth_denormalized, predictions)
+    predictions_denormalized, truth_denormalized = denormalize_data(predictions[:numPredictions],truth,vxmax,vymax)
+    plotter(predictions_denormalized, truth_denormalized, index=0)
+    relative_error(truth_denormalized, predictions_denormalized)
