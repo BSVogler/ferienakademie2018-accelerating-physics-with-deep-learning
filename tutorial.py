@@ -113,7 +113,7 @@ if __name__ == "__main__":
 
     #%%
     # apply the model on the data
-    numPredictions = 3
+    numPredictions = 10
     predictions = model.predict(train[:numPredictions, :], batch_size=1)
     truth = ground_truth[:numPredictions, :]
 
@@ -121,6 +121,6 @@ if __name__ == "__main__":
     predictions = predictions.reshape(len(predictions),64,64,3)
     truth = truth.reshape(len(truth),64,64,3)
 
-    plotter(predictions, truth)
+    plotter(predictions, truth,index=0)
     train_denormalized, truth_denormalized = denormalize_data(train[:numPredictions],truth,vxmax,vymax)
     relative_error(truth_denormalized, predictions)
