@@ -287,8 +287,8 @@ def denormalize_data(normalized_preds, normalized_targets, vxmax,vymax):
         denormalized_targets[s, :, :, 1] = normalized_targets[s, :, :, 1] * magnitude
         denormalized_targets[s, :, :, 2] = normalized_targets[s, :, :, 2] * magnitude
 
-        denormalized_preds[s, :, :, 1] = denormalized_preds[s, :, :, 1] * magnitude
-        denormalized_preds[s, :, :, 2] = denormalized_preds[s, :, :, 2] * magnitude
+        denormalized_preds[s, :, :, 1] = denormalized_preds[s, :, :, 1]# * magnitude
+        denormalized_preds[s, :, :, 2] = denormalized_preds[s, :, :, 2]# * magnitude
 
     return denormalized_preds, denormalized_targets
 
