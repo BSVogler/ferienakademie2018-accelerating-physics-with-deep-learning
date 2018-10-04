@@ -24,7 +24,7 @@ if __name__ == "__main__":
         ground_truth[i] = d[3:6]  # p, velx, vely
     # print("inputs shape = ", inputs.shape)
 
-    inputs, ground_truth = normalize_data(inputs, ground_truth)
+    inputs, ground_truth, vxmax, vymax = normalize_data(inputs, ground_truth)
 
     # reorder because the channels must be the last dimension
     inputs = inputs.transpose(0, 2, 3, 1)
