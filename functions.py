@@ -256,7 +256,7 @@ def normalize_data(inputs, targets, norm=1):
             normalized_targets[s, 1, :, :] = targets[s, 1, :, :] / magnitude
             normalized_targets[s, 2, :, :] = targets[s, 2, :, :] / magnitude
             # step3
-            normalized_targets[s, 0, :, :] = targets[s, 0, :, :] / magnitude ** 2
+            normalized_targets[s, 0, :, :] = targets[s, 0, :, :] / magnitude ** 2 - normalized_targets[s, 0, :, :].mean()
             # inputs stay the same
             normalized_inputs = inputs
     return normalized_inputs, normalized_targets, vxmax, vymax
