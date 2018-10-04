@@ -1,3 +1,4 @@
+
 import os
 
 # forces CPU usage
@@ -135,7 +136,6 @@ def plotter(predictionset, ground_truth, index=-1):
 
 def relative_error_tensor(truth, predictions):
     """
-
     :param truth: normalized ground truth, targets as [64,64,3]
     :param predictions: normalized output of network, predictions as [64,64,3]
     :return: relative error(scalar)
@@ -145,12 +145,11 @@ def relative_error_tensor(truth, predictions):
     print(truth)
     #if results == np.Inf:
     #    print("infinity reached")
-    #return results
+    return results
 
 
 def relative_error_multiple(truth, predictions):
     """
-
     :param truth: normalized ground truth, targets as [n_samples,64,64,3]
     :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
     :return: relative error(array)
@@ -162,7 +161,6 @@ def relative_error_multiple(truth, predictions):
 
 def relative_error(truth, predictions):
     """
-
     :param truth: normalized ground truth, targets as [n_samples,64,64,3]
     :param predictions: normalized output of network, predictions as [n_samples,64,64,3]
     :return: relative error(array)
@@ -300,7 +298,6 @@ def plot_conv_weights(model, layer):
     :param model: nn model
     :param layer: index of layer as an integer
     :return: plot of convolution layer weights and shape of kernels and no. of weights
-
     """
     if len(model.get_layer(index=layer).get_weights()) == 0:
         print("layer has no weights")
@@ -418,7 +415,6 @@ def plot_trainingcurves(history):
 
 def notify_macos(title, subtitle, message):
     """
-
     :param title:
     :param subtitle:
     :param message:
@@ -460,7 +456,6 @@ def arg_getter(truth, predictions):
 #calculates the mean sample from the samples
 def get_mean_img(reference,output):
     '''
-
     :param reference: ground truth samples
     :param output: model predictions
     :return: mean image of the samples, both pred. and truth and relative error for each channel, using the relative_error method
