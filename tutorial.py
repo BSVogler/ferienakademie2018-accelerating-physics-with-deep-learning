@@ -8,8 +8,9 @@ from visualization import vis
 from functions import *
 
 if __name__ == "__main__":
+    #%%
     # load dataset
-    dataDir = "./data/trainSmallFA/"
+    dataDir = "./data/testDataSetFinal/"
     files = listdir(dataDir)
     #files.sort()
     totalLength = len(files)
@@ -93,13 +94,14 @@ if __name__ == "__main__":
 
     model = keras.models.Model(inputs=init, outputs=ConvUp6)
 
-    model.compile(optimizer=tf.train.AdamOptimizer(0.0001), loss='mean_squared_error', metrics=['accuracy'])
+#%%
+    model.compile(optimizer=tf.train.AdamOptimizer(0.0001), loss='mean_absolute_error', metrics=['accuracy', relative_error])
     # AdamOptimizer(0.0006)
 
     print_memory_usage(model)
 
     # train the model
-    epochs = 10
+    epochs = 1
     history = model.fit(train, ground_truth, epochs=epochs, batch_size=40, validation_split=0.2, shuffle=True)
 
     notify_macos(title='Deep Learning is done.',
@@ -108,11 +110,17 @@ if __name__ == "__main__":
 
     # show results
     plot_trainingcurves(history)
+
+    #%%
     # apply the model on the data
-    predictions = model.predict(train[0:1, :], batch_size=1)
-    truth = ground_truth[0:1, :]
+    numPredictions = 3
+    predictions = model.predict(train[:numPredictions, :], batch_size=1)
+    truth = ground_truth[:numPredictions, :]
+
 
     predictions = predictions.reshape(len(predictions),64,64,3)
     truth = truth.reshape(len(truth),64,64,3)
 
     plotter(predictions, truth)
+    train_denormalized, truth_denormalized = denormalize_data(train[:numPredictions],truth,vxmax,vymax)
+    relative_error(truth_denormalized, predictions)
