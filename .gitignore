@@ -109,3 +109,4 @@ data/*
 dataGen/
 .DS_Store
 logs/
+*.h5

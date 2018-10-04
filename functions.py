@@ -109,7 +109,7 @@ def plotter(predictionset, ground_truth, index=-1):
     plt.subplot(331)
     plt.title('Rel. error pressure', fontsize=10)
     relerrp = np.abs(ground_truth[sampleindex, :, :, 0]-predictionset[sampleindex, :, :, 0]) /np.abs(ground_truth[sampleindex,:, :, 0] + eps)
-    relerrmaskp = np.ma.masked_where(relerrp > 1e5, relerrp)
+    relerrmaskp = np.ma.masked_where(relerrp > 1e4, relerrp)
     plt.imshow(relerrmaskp,cmap='jet')
     plt.colorbar()
     plt.axis('off')
@@ -117,7 +117,7 @@ def plotter(predictionset, ground_truth, index=-1):
     plt.subplot(332)
     plt.title('Rel. error x velocity', fontsize=10)
     relerrvx = np.abs(ground_truth[sampleindex, :, :, 1]-predictionset[sampleindex, :, :, 1]) /np.abs(ground_truth[sampleindex,:, :,1] + eps)
-    relerrmaskvx = np.ma.masked_where(relerrvx > 1e5, relerrvx)
+    relerrmaskvx = np.ma.masked_where(relerrvx > 1e4, relerrvx)
     plt.imshow(relerrmaskvx,cmap='jet')
     plt.colorbar()
     plt.axis('off')
@@ -125,7 +125,7 @@ def plotter(predictionset, ground_truth, index=-1):
     plt.subplot(333)
     plt.title('Rel. error y velocity', fontsize=10)
     relerrvy = np.abs(ground_truth[sampleindex, :, :, 2] - predictionset[sampleindex, :, :, 2]) /np.abs(ground_truth[sampleindex,:, :, 2] + eps)
-    relerrmaskvy = np.ma.masked_where(relerrvy > 1e5, relerrvy)
+    relerrmaskvy = np.ma.masked_where(relerrvy > 1e4, relerrvy)
     plt.imshow(relerrmaskvy,cmap='jet')
     plt.colorbar()
     plt.axis('off')
@@ -251,7 +251,34 @@ def normalize_data(inputs, targets, norm=1):
             normalized_targets[s, 0, :, :] = targets[s, 0, :, :] / magnitude ** 2
             # inputs stay the same
             normalized_inputs = inputs
-    return normalized_inputs, normalized_targets
+    return normalized_inputs, normalized_targets, vxmax, vymax
+
+
+#data denormalization
+def denormalize_data(normalized_inputs, normalized_targets, vxmax,vymax):
+    """
+    Denormalizes the data.
+    :param normalized_inputs: dimension 0: item index, 1: channel, 2: image dim x, 3: image dimy
+    :param normalized_targets: dimension 0: item index, 1: channel, 2: image dim x, 3: image dimy
+    :param vxmax: maximum vx values of each input sample
+    :param vymax: maximum vy values of each input sample
+    :return: denormalized data
+    """
+    denormalized_inputs = np.empty_like(normalized_inputs)
+    denormalized_targets = np.empty_like(normalized_targets)
+
+    for s in range(0, len(denormalized_inputs)):
+        #step 1 (get magntude of max vel. for each sample)
+        magnitude = np.sqrt(vxmax[s] ** 2 + vymax[s] ** 2)
+        # inputs stay the same
+        denormalized_inputs = normalized_inputs
+        #step 3
+        denormalized_targets[s, 0, :, :] = normalized_targets[s, 0, :, :] * magnitude ** 2
+        # step 2
+        denormalized_targets[s, 1, :, :] = normalized_targets[s, 1, :, :] * magnitude
+        denormalized_targets[s, 2, :, :] = normalized_targets[s, 2, :, :] * magnitude
+
+    return denormalized_inputs, denormalized_targets
 
 
 # plot conv layer weights
@@ -293,30 +320,58 @@ def plot_var_kernel(model, layerindex=-1, channel=0):
     :param channel: 0,1, or 2
     :return:
     """
-    fig = plt.figure()
-    if layerindex == -1:
-        varkernel = np.ndarray((len(model.layers), 4, 4))
-        for i in range(len(model.layers)):
-            weights = model.get_layer(index=layerindex).get_weights()[0]
-            varkernel[i] = np.var(weights, axis=(3))[:, :, channel]  # variance over every kernel
-        var = np.average(varkernel,axis=0) # variance of every layer combined
-        avgvar = np.average(var)
-        fig.suptitle("variance in kernel of ever layer combined, chanel: " + str(channel), fontsize=14, fontweight='bold')
 
+    if layerindex == -1:
+        var_kernel = np.zeros((len(model.layers), 4, 4))
+        mean_kernel = np.zeros((len(model.layers), 4, 4))
+        # for every layer
+        for i in range(len(model.layers)):
+            if len(model.get_layer(index=i).get_weights()) != 0:
+                weights = model.get_layer(index=i).get_weights()[0]
+                # variance across every kernel
+                kernelvar = np.var(weights, axis=(3))[:, :, channel]
+                kernelmean = np.mean(weights, axis=3)[:, :, channel]
+                # zeropadding
+                var_kernel[i, :kernelvar.shape[0], : kernelvar.shape[1]] = kernelvar
+                mean_kernel[i, :kernelmean.shape[0], : kernelmean.shape[1]] = kernelmean
+
+        # bar chart
+        fig = plt.figure()
+        fig.suptitle("mean per layer, chanel: " + str(channel), fontsize=14,
+                     fontweight='bold')
+        plt.bar(range(len(model.layers)),np.average(mean_kernel,axis=(1,2)))
+        plt.show()
+
+        fig = plt.figure()
+        fig.suptitle("variance per layer, chanel: " + str(channel), fontsize=14,
+                     fontweight='bold')
+        plt.bar(range(len(model.layers)), np.average(var_kernel, axis=(1, 2)))
+        plt.show()
+
+        fig = plt.figure()
+        fig.suptitle("variance in kernel of ever layer combined, chanel: " + str(channel), fontsize=14, fontweight='bold')
+        var = np.average(var_kernel, axis=0) # variance of every layer combined
+        # unit normalize
+        std = np.std(var)
+        if std != 0:
+            var /= std
+        var_avg = np.average(var)
     else:
         if len(model.get_layer(index=layerindex).get_weights())!=0:
+            fig = plt.figure()
             weights = model.get_layer(index=layerindex).get_weights()[0]
             var = np.var(weights, axis=(3))[:, :, channel] # variance over every kernel
-            avgvar = np.average(var)
+            var_avg = np.average(var)
             fig.suptitle("variance in kernel of layer: "+str(layerindex)+" chanel: "+str(channel), fontsize=14, fontweight='bold')
         else:
             print("layer has no weights")
             return
 
     plt.imshow(var)
-    plt.text(1,1,str('%.2E' % avgvar))
+    plt.text(1,1,str('%.2E' % var_avg))
     plt.colorbar()
     fig.show()
+
 
 def sizeof_fmt(num, suffix='B'):
     """
@@ -389,3 +444,17 @@ def arg_getter(truth, predictions):
     sorted_args = [list(test).index(error) for error in sort]
     # decreasing order, arg 0 is the best, -1 is the worst
     return sorted_args
+
+#calculates the mean sample from the samples
+def get_mean_img(reference,output):
+    '''
+
+    :param reference: ground truth samples
+    :param output: model predictions
+    :return: mean image of the samples, both pred. and truth and relative error for each channel, using the relative_error method
+    '''
+    mean_ref = reference.sum(axis = 0)/len(reference)
+    mean_output = output.sum(axis = 0)/len(output)
+    rel_err = []
+    [rel_err.append(relative_error(mean_ref[:,:,ch], mean_output[:,:,ch])) for ch in range(0,3)]
+    return mean_ref, mean_output, rel_err
