@@ -249,7 +249,34 @@ def normalize_data(inputs, targets, norm=1):
             normalized_targets[s, 0, :, :] = targets[s, 0, :, :] / magnitude ** 2
             # inputs stay the same
             normalized_inputs = inputs
-    return normalized_inputs, normalized_targets
+    return normalized_inputs, normalized_targets, vxmax, vymax
+
+
+#data denormalization
+def denormalize_data(normalized_inputs, normalized_targets, vxmax,vymax):
+    """
+    Denormalizes the data.
+    :param normalized_inputs: dimension 0: item index, 1: channel, 2: image dim x, 3: image dimy
+    :param normalized_targets: dimension 0: item index, 1: channel, 2: image dim x, 3: image dimy
+    :param vxmax: maximum vx values of each input sample
+    :param vymax: maximum vy values of each input sample
+    :return: denormalized data
+    """
+    denormalized_inputs = np.empty_like(normalized_inputs)
+    denormalized_targets = np.empty_like(normalized_targets)
+
+    for s in range(0, len(denormalized_inputs)):
+        #step 1 (get magntude of max vel. for each sample)
+        magnitude = np.sqrt(vxmax[s] ** 2 + vymax[s] ** 2)
+        # inputs stay the same
+        denormalized_inputs = normalized_inputs
+        #step 3
+        denormalized_targets[s, 0, :, :] = normalized_targets[s, 0, :, :] * magnitude ** 2
+        # step 2
+        denormalized_targets[s, 1, :, :] = normalized_targets[s, 1, :, :] * magnitude
+        denormalized_targets[s, 2, :, :] = normalized_targets[s, 2, :, :] * magnitude
+
+    return denormalized_inputs, denormalized_targets
 
 
 # plot conv layer weights
@@ -332,6 +359,7 @@ def plot_var_kernel(model, layerindex=-1, channel=0):
     plt.colorbar()
     fig.show()
 
+
 def sizeof_fmt(num, suffix='B'):
     """
     bytes to human readable format
@@ -403,3 +431,17 @@ def arg_getter(truth, predictions):
     sorted_args = [list(test).index(error) for error in sort]
     # decreasing order, arg 0 is the best, -1 is the worst
     return sorted_args
+
+#calculates the mean sample from the samples
+def get_mean_img(reference,output):
+    '''
+
+    :param reference: ground truth samples
+    :param output: model predictions
+    :return: mean image of the samples, both pred. and truth and relative error for each channel, using the relative_error method
+    '''
+    mean_ref = reference.sum(axis = 0)/len(reference)
+    mean_output = output.sum(axis = 0)/len(output)
+    rel_err = []
+    [rel_err.append(relative_error(mean_ref[:,:,ch], mean_output[:,:,ch])) for ch in range(0,3)]
+    return mean_ref, mean_output, rel_err
