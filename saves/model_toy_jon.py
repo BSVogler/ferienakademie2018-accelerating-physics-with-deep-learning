@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
     # data preprocessing
     # normalize values
-    normalized_inputs, normalized_targets = normalize_data(inputs, targets, norm=2)
+    normalized_inputs, normalized_targets = preprocess_data(inputs, targets, norm=2)
     print('Normalized input maxes:', normalized_inputs[:, 0, :, :].max(), normalized_inputs[:, 1, :, :].max(),
           normalized_inputs[:, 2, :, :].max())
     print('Normalized input mins:', normalized_inputs[:, 0, :, :].min(), normalized_inputs[:, 1, :, :].min(),
@@ -118,24 +118,24 @@ if __name__ == "__main__":
                                 strides=2,
                                 padding='valid',
                                 data_format="channels_last",
-                                activation='relu')(inputs)
-    conv2 = keras.layers.Conv2D(input_shape=(32, 32, 3),
+                                activation='elu')(inputs)
+    conv2 = keras.layers.Conv2D(input_shape=(16, 16, 3),
                                 filters=16,
                                 kernel_size=4,
                                 strides=2,
                                 padding='same',
                                 data_format="channels_last",
-                                activation='relu')(conv1)
-    conv3 = keras.layers.Conv2D(input_shape=(16, 16, 3),
+                                activation='elu')(conv1)
+    conv3 = keras.layers.Conv2D(input_shape=(8, 8, 3),
                                 filters=16,
-                                kernel_size=4,
-                                strides=2,
+                                kernel_size=16,
+                                strides=(1, 1),
                                 padding='same',
                                 data_format="channels_last",
-                                activation='relu')(conv2)
-    conv4=keras.layers.Conv2D(input_shape=(8,8,3),filters=64,kernel_size=4,strides=(1,1),padding='same',activation='relu')(conv3)
+                                activation='elu')(conv2)
+    #conv3=keras.layers.Conv2D(input_shape=(8,8,3),filters=16,kernel_size=(8,8),strides=(1,1),padding='same',activation='elu')(conv2)
     #upsamp = keras.layers.UpSampling2D(size=(4, 4), data_format="channels_last", input_shape=(16, 16, 3))(conv3)
-    x=keras.layers.Flatten()(conv4)
+    x=keras.layers.Flatten()(conv3)
     #outputs = keras.layers.Conv2D(filters=3,kernel_size=(16, 16), padding='same',data_format="channels_last", input_shape=(16, 16, 3))(upsamp)
 #    def layerexpand(x):
     lines=[keras.layers.Concatenate]*64
@@ -159,37 +159,25 @@ if __name__ == "__main__":
             #extC=keras.backend.repeat_elements(extC,rep=keras.backend.shape(x)[0],axis=0)
             #ext0=keras.backend.repeat_elements(ext0,rep=keras.backend.shape(x)[0],axis=0)
 
-        s1=keras.layers.Lambda(cutout1d,arguments={'k':[i*32,i*32+3]})(x)
-        s2=keras.layers.Lambda(cutout1d,arguments={'k':[i*32+4,i*32+7]})(x)
-        s3=keras.layers.Lambda(cutout1d,arguments={'k':[i*32+8,i*32+11]})(x)
-        s4=keras.layers.Lambda(cutout1d,arguments={'k':[i*32+12,i*32+15]})(x)
-        s5=keras.layers.Lambda(cutout1d,arguments={'k':[i*32+16,i*32+19]})(x)
-        s6=keras.layers.Lambda(cutout1d,arguments={'k':[i*32+20,i*32+23]})(x)
-        s7=keras.layers.Lambda(cutout1d,arguments={'k':[i*32+24,i*32+27]})(x)
-        s8=keras.layers.Lambda(cutout1d,arguments={'k':[i*32+28,i*32+31]})(x)
+        s1=keras.layers.Lambda(cutout1d,arguments={'k':[i*64,i*64+16]})(x)
+        s2=keras.layers.Lambda(cutout1d,arguments={'k':[i*64+16,i*64+32]})(x)
+        s3=keras.layers.Lambda(cutout1d,arguments={'k':[i*64+32,i*64+48]})(x)
+        s4=keras.layers.Lambda(cutout1d,arguments={'k':[i*64+48,i*64+64]})(x)
         
-        c1=keras.layers.Dense(3*(32-i),activation='relu')(s1)
-        c2=keras.layers.Dense(3*(31-i),activation='relu')(s2)
-        c3=keras.layers.Dense(3*(32-i),activation='relu')(s3)
-        c4=keras.layers.Dense(3*(31-i),activation='relu')(s4)
-        c5=keras.layers.Dense(3*(32-i),activation='relu')(s5)
-        c6=keras.layers.Dense(3*(31-i),activation='relu')(s6)
-        c7=keras.layers.Dense(3*(32-i),activation='relu')(s7)
-        c8=keras.layers.Dense(3*(31-i),activation='relu')(s8)
+        c1=keras.layers.Dense(3*(63-2*i),activation='elu')(s1)
+        c2=keras.layers.Dense(3*(63-2*i),activation='elu')(s2)
+        c3=keras.layers.Dense(3*(63-2*i),activation='elu')(s3)
+        c4=keras.layers.Dense(3*(63-2*i),activation='elu')(s4)
 
         #c1=keras.layers.Dense(3*(63-2*i),activation='elu')(x[i*64:i*64+16])
         #c2=keras.layers.Dense(3*(63-2*i),activation='elu')(x[i*64+16:i*64+32])
         #c3=keras.layers.Dense(3*(63-2*i),activation='elu')(x[i*64+32:i*64+48])
         #c4=keras.layers.Dense(3*(63-2*i),activation='elu')(x[i*64+48:i*64+64])
             
-        u1=keras.layers.Reshape(((32-i),1,3))(c1)
-        u2=keras.layers.Reshape(((31-i),1,3))(c2)
-        u3=keras.layers.Reshape((1,(32-i),3))(c3)
-        u4=keras.layers.Reshape((1,(31-i),3))(c4)
-        u5=keras.layers.Reshape(((32-i),1,3))(c5)
-        u6=keras.layers.Reshape(((31-i),1,3))(c6)
-        u7=keras.layers.Reshape((1,(32-i),3))(c7)
-        u8=keras.layers.Reshape((1,(31-i),3))(c8)
+        u1=keras.layers.Reshape(((63-2*i),1,3))(c1)
+        u2=keras.layers.Reshape((1,(63-2*i),3))(c2)
+        u3=keras.layers.Reshape(((63-2*i),1,3))(c3)
+        u4=keras.layers.Reshape((1,(63-2*i),3))(c4)
             
         #fullspace=0*inputs
         #extL=fullspace[:,0:i,0:1,:]
@@ -200,10 +188,10 @@ if __name__ == "__main__":
         ext0=keras.layers.Lambda(cutout0,arguments={'k':[0,1,0,1,0,4]})(inputs)
             
             #if i>0:
-        lines[i]=keras.layers.Concatenate(axis=1)([extL,u1,u2,extL,ext0])
-        lines[63-i]=keras.layers.Concatenate(axis=1)([ext0,extL,u5,u6,extL])
-        columns[i]=keras.layers.Concatenate(axis=2)([ext0,extC,u3,u4,extC])
-        columns[63-i]=keras.layers.Concatenate(axis=2)([extC,u7,u8,extC,ext0])
+        lines[i]=keras.layers.Concatenate(axis=1)([extL,u1,extL,ext0])
+        lines[63-i]=keras.layers.Concatenate(axis=1)([ext0,extL,u3,extL])
+        columns[i]=keras.layers.Concatenate(axis=2)([ext0,extC,u2,extC])
+        columns[63-i]=keras.layers.Concatenate(axis=2)([extC,u4,extC,ext0])
         
     allLines=keras.layers.Concatenate(axis=2)(lines)
     allColumns=keras.layers.Concatenate(axis=1)(columns)
@@ -214,14 +202,10 @@ if __name__ == "__main__":
         #plt.imshow(outplane2[0,:,:,1])
         #print(outplane.shape) 
     #    return outplane
-    #reexpand=keras.layers.Lambda(layerexpand)(flat)
-    concEnd=keras.layers.Concatenate(axis=3)([inputs,reexpand])
-    convEnd = keras.layers.Conv2D(filters=5,activation='relu',kernel_size=3, padding='same',data_format="channels_last", input_shape=(64,64, 3))(concEnd)
-#    convEnd2 = keras.layers.Conv2D(filters=3,activation='relu',kernel_size=3, padding='same',data_format="channels_last", input_shape=(64,64, 3))(convEnd)
-    convEnd3 = keras.layers.Conv2D(filters=3,kernel_size=3, padding='same',data_format="channels_last", input_shape=(64,64, 3))(convEnd)
+    #reexpand=keras.layers.Lambda(layerexpand)(flat) 
+    convEnd = keras.layers.Conv2D(filters=3,kernel_size=(3, 3), padding='same',data_format="channels_last", input_shape=(64,64, 3))(reexpand)
 
-
-    outputs=keras.layers.Flatten()(convEnd3)
+    outputs=keras.layers.Flatten()(convEnd)
 
 
 
@@ -233,8 +217,9 @@ if __name__ == "__main__":
     model = keras.Model(inputs=inputs,outputs=outputs)#keras.Sequential()
 
     # train the model
-    model.compile(optimizer=tf.train.AdamOptimizer(0.0003), loss='mean_absolute_error',metrics=[relative_error])
-    model.fit(train_val_inputs, train_val_targets, batch_size=60, epochs=400, validation_split=.1,verbose=1)
+    model.compile(optimizer=tf.train.AdamOptimizer(0.0003), loss='mean_absolute_error',
+                  metrics=[relative_error])
+    model.fit(train_val_inputs, train_val_targets, batch_size=60, epochs=20, validation_split=.1,verbose=1)
     '''
     model.summary()
     hist = model.history
